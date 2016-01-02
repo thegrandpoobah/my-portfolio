@@ -27,12 +27,25 @@
       <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
     <![endif]-->
 
-    
+	<div class="row">
+		<div class="col-md-8">
+			<h1>CAD Positions</h1>
+			<div id="cadPositions" class="position-container"></div>
+			
+			<h1>USD Positions</h1>
+			<div id="usdPositions" class="position-container"></div>
+		</div>
+		<div class="col-md-4">
+		Sidebar
+		</div>
+	</div>
 	
-
     <!-- build:js(.) scripts/vendor.js -->
     <!-- bower:js -->
     <script src="/bower_components/jquery/dist/jquery.js"></script>
+    <script src="/bower_components/bluebird/js/browser/bluebird.js"></script>
+    <script src="/bower_components/lodash/lodash.js"></script>
+    <script src="/bower_components/handlebars/handlebars.js"></script>
     <!-- endbower -->
     <!-- endbuild -->
 

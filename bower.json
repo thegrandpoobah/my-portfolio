@@ -2,8 +2,11 @@
   "name": "questrade",
   "private": true,
   "dependencies": {
-    "bootstrap-sass": "~3.3.5",
-    "modernizr": "~2.8.3"
+    "bluebird": "~3.1.1",
+    "lodash": "~3.10.1",
+    "jquery": "~2.1.4",
+    "handlebars": "~4.0.5",
+    "bootstrap-sass": "~3.3.6"
   },
   "overrides": {
     "bootstrap-sass": {
@@ -13,5 +16,20 @@
         "assets/javascripts/bootstrap.js"
       ]
     }
-  }
+  },
+  "authors": [
+    "Sahab Yazdani <sahab.yazdani@gmail.com>"
+  ],
+  "description": "",
+  "main": "",
+  "moduleType": [],
+  "license": "MIT",
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
 }
