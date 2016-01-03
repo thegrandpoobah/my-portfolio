@@ -74,6 +74,22 @@ function renderPositionDetails($position) {
 	
 	var symbolInfo = $.getJSON('/api/symbols/' + symbolId)
 	
+	symbolInfo.then(function(resp) {
+		var stockInfo = resp.symbols[0]
+		stockInfo.curr = stockInfo.currency
+
+		$('#symbol'+symbolId+' .sidebar-container').html(templates['position-details-template'](stockInfo))
+
+		MG.data_graphic({
+			title: stockInfo.symbol + ' vs ' + benchmarkMap[stockInfo.listingExchange],
+			chart_type: 'missing-data',
+			missing_text: 'Loading...',
+			target: '#symbol'+symbolId+' .chart-container',
+			full_width: true,
+			height: 400
+		})
+	})
+	
 	var endTime = moment()
 	var startTime = moment(endTime).subtract(1, 'y')
 	
@@ -82,9 +98,8 @@ function renderPositionDetails($position) {
 	$.when(symbolInfo, symbolCandle).then(function(r1, r2, r3) {
 		var stockInfo = r1[0].symbols[0]
 		stockInfo.curr = stockInfo.currency
+
 		var stockPrices = createIndexedData(r2[0].candles)
-		
-		$('#symbol'+symbolId+' .sidebar-container').html(templates['position-details-template'](stockInfo))
 		
 		$.getJSON('/api/symbols/search?prefix='+benchmarkMap[stockInfo.listingExchange]).then(function(resp) {
 			return $.getJSON('/api/markets/candles/'+resp.symbols[0].symbolId+'?startTime='+startTime.format()+'&endTime='+endTime.format()+'&interval=OneDay')

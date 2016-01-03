@@ -27,7 +27,7 @@
 			<thead>
 				<tr>
 					<th>Symbol</th>
-					<th class="text-right">Portfolio Weight</th>
+					<th class="text-right">% Weight</th>
 					<th class="text-right">Shares</th>
 					<th class="text-right">Avg Buy Price</th>
 					<th class="text-right">Cost</th>
@@ -82,7 +82,12 @@
 		<tr id="symbol{{symbolId}}" class="position-details nohover">
 			<td colspan="9">
 				<div class="row">
-					<div class="sidebar-container col-md-3"></div>
+					<div class="sidebar-container col-md-3">
+						<div class="row"><div class="sidebar-header col-md-12"><div class="bg-primary"><strong>Vitals</strong></div></div></div>
+						<div class="row"><div class="col-md-12">Loading...</div></div>
+						<div class="row"><div class="sidebar-header col-md-12"><div class="bg-primary"><strong>Industry</strong></div></div></div>
+						<div class="row"><div class="col-md-12">Loading...</div></div>
+					</div>
 					<div class="col-md-9">
 						<div class="chart-container"></div>
 						<div><center><div class="legend-container"></div></center></div>
@@ -92,7 +97,7 @@
 		</tr>
 	</script>
  	<script id="position-details-template" type="text/x-handlerbars-template">
-		<div class="row"><div class="sidebar-header sidebar-header-first col-md-12"><div class="bg-primary"><strong>Vitals</strong></div></div></div>
+		<div class="row"><div class="sidebar-header col-md-12"><div class="bg-primary"><strong>Vitals</strong></div></div></div>
 		
 		<div class="row"><div class="col-md-4"><strong>Symbol:</strong></div><div class="col-md-8">{{symbol}} ({{listingExchange}})</div></div>
 		<div class="row"><div class="col-md-4"><strong>Description:</strong></div><div class="col-md-8">{{description}}</div></div>
