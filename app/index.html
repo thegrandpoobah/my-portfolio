@@ -12,6 +12,7 @@
 
     <!-- build:css(.) styles/vendor.css -->
     <!-- bower:css -->
+    <link rel="stylesheet" href="/bower_components/metrics-graphics/dist/metricsgraphics.css" />
     <!-- endbower -->
     <!-- endbuild -->
     <!-- build:css(.tmp) styles/main.css -->
@@ -28,14 +29,13 @@
     <![endif]-->
 
 	<div class="positions-master-container row">
-		<div class="col-md-9">
+		<div class="col-md-12">
 			<h1>CAD Positions</h1>
 			<div id="cadPositions" class="position-container"></div>
 			
 			<h1>USD Positions</h1>
 			<div id="usdPositions" class="position-container"></div>
 		</div>
-		<div id="sidebar" class="sidebar col-md-3"></div>
 	</div>
 	
     <!-- build:js(.) scripts/vendor.js -->
@@ -45,6 +45,8 @@
     <script src="/bower_components/lodash/lodash.js"></script>
     <script src="/bower_components/handlebars/handlebars.js"></script>
     <script src="/bower_components/moment/moment.js"></script>
+    <script src="/bower_components/d3/d3.js"></script>
+    <script src="/bower_components/metrics-graphics/dist/metricsgraphics.js"></script>
     <!-- endbower -->
     <!-- endbuild -->
 
