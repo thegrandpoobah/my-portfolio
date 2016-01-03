@@ -64,7 +64,13 @@ function renderPositionDetails($position) {
 		return series
 	}
 
-	var symbolId = $position.data('symbolid')
+	var symbolId = $position.closest('a').data('symbolid')
+
+	if ($('#symbol'+symbolId).length > 0) {
+		$position.find('.glyphicon').removeClass('glyphicon-menu-down').addClass('glyphicon-menu-right')
+		$('#symbol'+symbolId).remove()
+		return
+	}
 	
 	var symbolInfo = $.getJSON('/api/symbols/' + symbolId)
 	
@@ -83,7 +89,6 @@ function renderPositionDetails($position) {
 		$.getJSON('/api/symbols/search?prefix='+benchmarkMap[stockInfo.listingExchange]).then(function(resp) {
 			return $.getJSON('/api/markets/candles/'+resp.symbols[0].symbolId+'?startTime='+startTime.format()+'&endTime='+endTime.format()+'&interval=OneDay')
 		}).then(function(resp) {
-			console.log(stockInfo, stockPrices, resp.candles)
 			var benchmarkPrices = createIndexedData(resp.candles)
 
 			MG.data_graphic({
@@ -105,8 +110,8 @@ function renderPositionDetails($position) {
 		})
 	})
 	
-	$position.closest('table').find('tr.position-details').remove()
 	$position.closest('tr').after(templates['position-details-container-template']({symbolId: symbolId}))
+	$position.closest('a').find('.glyphicon').removeClass('glyphicon-menu-right').addClass('glyphicon-menu-down')
 }
 
 $(function() {

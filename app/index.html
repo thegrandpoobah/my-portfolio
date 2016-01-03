@@ -2,7 +2,7 @@
 <html class="no-js" lang="">
   <head>
     <meta charset="utf-8">
-    <title>questrade</title>
+    <title>My Portfolio</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -23,16 +23,16 @@
     <!-- endbuild -->
     
 	<script id="position-table-template" type="text/x-handlerbars-template">
-		<table class="table table-condensed table-hover">
+		<table class="table table-condensed table-hover positions-table">
 			<thead>
 				<tr>
 					<th>Symbol</th>
-					<th>Portfolio Weight</th>
-					<th>Shares</th>
-					<th>Avg Buy Price</th>
-					<th>Cost</th>
-					<th>Current Price</th>
-					<th>Market Value</th>
+					<th class="text-right">Portfolio Weight</th>
+					<th class="text-right">Shares</th>
+					<th class="text-right">Avg Buy Price</th>
+					<th class="text-right">Cost</th>
+					<th class="text-right">Current Price</th>
+					<th class="text-right">Market Value</th>
 					<th>Unrealized Gain/Loss (%)</th>
 					<th>Realized Gain/Loss (%)</th>
 				</tr>
@@ -40,40 +40,42 @@
 			<tbody>
 			{{#positions}}
 				<tr>
-					<td><a href="#" data-symbolid="{{symbolId}}"">{{symbol}}</a></td>
-					<td>{{percentage portfolioWeight}}</td>
-					<td>{{openQuantity}}</td>
-					<td>{{currency averageEntryPrice}}</td>
-					<td>{{currency totalCost}}</td>
-					<td>{{currency currentPrice}}</td>
-					<td>{{currency currentMarketValue}}</td>
+					<td><a href="#" data-symbolid="{{symbolId}}"><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span>{{symbol}}</a></td>
+					<td class="text-right">{{percentage portfolioWeight}}</td>
+					<td class="text-right">{{openQuantity}}</td>
+					<td class="text-right">{{currency averageEntryPrice}}</td>
+					<td class="text-right">{{currency totalCost}}</td>
+					<td class="text-right">{{currency currentPrice}}</td>
+					<td class="text-right">{{currency currentMarketValue}}</td>
 					<td class="{{currencyClass openPnl}}">{{currency openPnl}} ({{percentage percentageOpenPnl}}%)</td>
 					<td class="{{currencyClass closedPnl}}">{{currency closedPnl}} ({{percentage percentageClosedPnl}}%)</td>
 				</tr>
 			{{/positions}}
 				<tr class="nohover">
 					<td>Cash</td>
-					<td>{{percentage balance.portfolioWeight}}</td>
-					<td></td>
-					<td></td>
-					<td></td>
-					<td></td>
-					<td>{{currency balance.cash}}</td>
-					<td></td>
-					<td></td>
-				</tr>
-				<tr class="nohover">
-					<td><strong>Total Market Value</strong></td>
-					<td></td>
-					<td></td>
-					<td></td>
-					<td><strong>{{currency balance.cost}}</strong></td>
-					<td></td>
-					<td><strong>{{currency balance.marketValue}}</strong></td>
-					<td class="{{currencyClass balance.openPnl}}"><strong>{{currency balance.openPnl}} ({{percentage balance.percentageOpenPnl}}%)</strong></td>
-					<td></td>
+					<td class="text-right">{{percentage balance.portfolioWeight}}</td>
+					<td class="text-right"></td>
+					<td class="text-right"></td>
+					<td class="text-right"></td>
+					<td class="text-right"></td>
+					<td class="text-right">{{currency balance.cash}}</td>
+					<td class="text-right"></td>
+					<td class="text-right"></td>
 				</tr>
 			</tbody>
+			<tfoot>
+				<tr class="nohover">
+					<th>Total Market Value</th>
+					<th class="text-right"></th>
+					<th class="text-right"></th>
+					<th class="text-right"></th>
+					<th class="text-right">{{currency balance.cost}}</th>
+					<th class="text-right"></th>
+					<th class="text-right">{{currency balance.marketValue}}</th>
+					<th class="{{currencyClass balance.openPnl}}">{{currency balance.openPnl}} ({{percentage balance.percentageOpenPnl}}%)</th>
+					<th class="text-right"></th>
+				</tr>
+			</tfoot>
 		</table>
 	</script>
 	<script id="position-details-container-template" type="text/x-handlerbars-template">
@@ -103,8 +105,8 @@
 		
 		<div class="row"><div class="sidebar-header col-md-12"><div class="bg-primary"><strong>Industry</strong></div></div></div>
 		
-		<div class="row"><div class="col-md-4"><strong>Group:</strong></div><div class="col-md-8">{{industryGroup}}</div></div>
 		<div class="row"><div class="col-md-4"><strong>Sector:</strong></div><div class="col-md-8">{{industrySector}}</div></div>
+		<div class="row"><div class="col-md-4"><strong>Group:</strong></div><div class="col-md-8">{{industryGroup}}</div></div>
 		<div class="row"><div class="col-md-4"><strong>Subgroup:</strong></div><div class="col-md-8">{{industrySubgroup}}</div></div>
 	</script>
  </head>
@@ -113,16 +115,21 @@
       <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
     <![endif]-->
 
-	<div class="positions-master-container row">
-		<div class="col-md-12">
-			<h1>CAD Positions</h1>
-			<div id="cadPositions" class="position-container"></div>
-			
-			<h1>USD Positions</h1>
-			<div id="usdPositions" class="position-container"></div>
+	<div class="container-fluid">
+		<div class="row">
+			<div class="panel panel-default">
+				<div class="panel-heading"><strong>CAD Positions</strong></div>
+				<div id="cadPositions" class="position-container"></div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="panel panel-default">
+				<div class="panel-heading"><strong>USD Positions</strong></div>
+				<div id="usdPositions" class="position-container"></div>
+			</div>
 		</div>
 	</div>
-	
+
     <!-- build:js(.) scripts/vendor.js -->
     <!-- bower:js -->
     <script src="/bower_components/jquery/dist/jquery.js"></script>
