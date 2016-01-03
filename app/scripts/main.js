@@ -48,12 +48,27 @@ function onSymbolLoadComplete(positions, balances) {
 		byExchange[position.listingExchange].push(position)
 	})
 	
-var tblTemplate = Handlebars.compile('<table class="table table-condensed table-hover"><thead><tr><th>Symbol</th><th>Portfolio Weight</th><th>Shares</th><th>Avg Buy Price</th><th>Cost</th><th>Current Price</th><th>Market Value</th><th>Unrealized Gain/Loss (%)</th><th>Realized Gain/Loss (%)</th></tr></thead><tbody>{{#positions}}<tr><td><a href="#" data-symbolId="{{symbolId}}"">{{symbol}}</a></td><td>{{percentage portfolioWeight}}</td><td>{{openQuantity}}</td><td>{{currency averageEntryPrice}}</td><td>{{currency totalCost}}</td><td>{{currency currentPrice}}</td><td>{{currency currentMarketValue}}</td><td class="{{currencyClass openPnl}}">{{currency openPnl}} ({{percentage percentageOpenPnl}}%)</td><td class="{{currencyClass closedPnl}}">{{currency closedPnl}} ({{percentage percentageClosedPnl}}%)</td></tr>{{/positions}}<tr><td>Cash</td><td>{{percentage balance.portfolioWeight}}</td><td></td><td></td><td></td><td></td><td>{{currency balance.cash}}</td><td></td><td></td></tr></tr><tr><td>Total Market Value</td><td></td><td></td><td></td><td>{{currency balance.cost}}</td><td></td><td>{{currency balance.marketValue}}</td><td class="{{currencyClass balance.openPnl}}">{{currency balance.openPnl}} ({{percentage balance.percentageOpenPnl}}%)</td><td></td></tr></tbody></table>')
+var tblTemplate = Handlebars.compile('<table class="table table-condensed table-hover"><thead><tr><th>Symbol</th><th>Portfolio Weight</th><th>Shares</th><th>Avg Buy Price</th><th>Cost</th><th>Current Price</th><th>Market Value</th><th>Unrealized Gain/Loss (%)</th><th>Realized Gain/Loss (%)</th></tr></thead><tbody>{{#positions}}<tr><td><a href="#" data-symbolid="{{symbolId}}"">{{symbol}}</a></td><td>{{percentage portfolioWeight}}</td><td>{{openQuantity}}</td><td>{{currency averageEntryPrice}}</td><td>{{currency totalCost}}</td><td>{{currency currentPrice}}</td><td>{{currency currentMarketValue}}</td><td class="{{currencyClass openPnl}}">{{currency openPnl}} ({{percentage percentageOpenPnl}}%)</td><td class="{{currencyClass closedPnl}}">{{currency closedPnl}} ({{percentage percentageClosedPnl}}%)</td></tr>{{/positions}}<tr><td>Cash</td><td>{{percentage balance.portfolioWeight}}</td><td></td><td></td><td></td><td></td><td>{{currency balance.cash}}</td><td></td><td></td></tr></tr><tr><td>Total Market Value</td><td></td><td></td><td></td><td>{{currency balance.cost}}</td><td></td><td>{{currency balance.marketValue}}</td><td class="{{currencyClass balance.openPnl}}">{{currency balance.openPnl}} ({{percentage balance.percentageOpenPnl}}%)</td><td></td></tr></tbody></table>')
 	$('#cadPositions').html(tblTemplate({positions: byCurrency['CAD'], balance: cash['CAD']}))
 	$('#usdPositions').html(tblTemplate({positions: byCurrency['USD'], balance: cash['USD']}))
 	
 	cache.positions = positions
 	cache.balances = balances
+}
+
+function renderSidebar(symbol) {
+	var position = _.find(cache.positions, function(position) {
+		return position.symbolId == symbol
+	})
+	
+	if (_.isUndefined(position)) {
+		return
+	}
+	
+	console.log(position)
+	
+	var positionTemplate = Handlebars.compile('<div class="row"><div class="col-md-4"><strong>Symbol:</strong></div><div class="col-md-8"><a href="http://finance.yahoo.com/echarts?s={{symbol}}#{%22allowChartStacking%22:true}" target="_blank">{{symbol}}</a> ({{listingExchange}})</div></div><div class="row"><div class="col-md-4"><strong>Description:</strong></div><div class="col-md-8">{{description}}</div></div><div class="row"><div class="col-md-4"><strong>Dividend:</strong></div><div class="col-md-8">{{currency dividend}}/{{yield}}% ({{date dividendDate}})</div></div><div class="row"><div class="sidebar-industry col-md-12"><center><strong>Industry</strong></center></div></div><div class="row"><div class="col-md-4"><strong>Group:</strong></div><div class="col-md-8">{{industryGroup}}</div></div><div class="row"><div class="col-md-4"><strong>Sector:</strong></div><div class="col-md-8">{{industrySector}}</div></div><div class="row"><div class="col-md-4"><strong>Subgroup:</strong></div><div class="col-md-8">{{industrySubgroup}}</div></div>')
+	$('#sidebar').html(positionTemplate(position))
 }
 
 $(function() {
@@ -62,7 +77,7 @@ $(function() {
 			if (amount >= 0) {
 				return amount.toFixed(2)
 			} else {
-				return '(' + amount.toFixed(2) + ')'
+				return '(' + Math.abs(amount).toFixed(2) + ')'
 			}
 		},
 		'currencyClass': function(amount) {
@@ -76,6 +91,9 @@ $(function() {
 		},
 		'percentage': function(amount) {
 			return (amount * 100).toFixed(2)
+		},
+		'date': function(date) {
+			return moment(date, moment.ISO_8601).format('L')
 		}
 	})
 	
@@ -113,8 +131,10 @@ $(function() {
 		})
 	})
 	
-	$('.position-container a').on('click', function(e) {
-		console.log(e)
+	$('.position-container').on('click', 'a', function(e) {
+		renderSidebar($(e.target).data('symbolid'))
+		
+		e.preventDefault()
 	})
 	
 //	$.getJSON('/api/symbols/search?prefix=TSX').then(function(ss) {
