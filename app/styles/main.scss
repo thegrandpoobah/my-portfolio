@@ -53,6 +53,9 @@ body {
   padding: 10px;
 }
 
+.table.table-hover tr.nohover:hover {
+  background-color: white;
+}
 .currency-positive {
   color: rgb(68, 157, 68);
 }
@@ -67,9 +70,8 @@ body {
   position: fixed;
   right: 0;
 }
-.sidebar-industry {
-  margin: 0 5px;
-  font-size: 125%;
+.sidebar-header {
+  margin: 10px 0;
 }
 /* Main marketing message and sign up button */
 .jumbotron {
