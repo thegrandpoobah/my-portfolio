@@ -1,69 +1,111 @@
 var templates = {}
 
-function onSymbolLoadComplete(positions, balances) {
-  var byCurrency = {}
-  
-  var cash = {}
-  _.each(balances.perCurrencyBalances, function(balance) {
-    balance.portfolioWeight = balance.cash / balance.marketValue
-    balance.cost = 0
-    balance.openPnl = 0
-    balance.percentageOpenPnl = 0
-    cash[balance.currency] = balance
-  })
-  
-  _.each(positions, function(position) {
-    if (position.symbol.lastIndexOf('.TO') === -1) {
-      position.currency = 'USD'
-    } else {
-      position.currency = 'CAD'
-    }
-  })
-  
-  _.each(positions, function(position) {
-    if (_.isUndefined(byCurrency[position.currency])) {
-      byCurrency[position.currency] = []
-    }
-    
-    position.percentageOpenPnl = position.openPnl / position.totalCost
-    position.percentageClosedPnl = position.closedPnl / position.totalCost
-    position.portfolioWeight = position.currentMarketValue / cash[position.currency].marketValue 
-    
-    cash[position.currency].cost += position.totalCost
-    cash[position.currency].openPnl = cash[position.currency].marketValue - cash[position.currency].cost
-    cash[position.currency].percentageOpenPnl = cash[position.currency].openPnl / cash[position.currency].cost
-    
-    byCurrency[position.currency].push(position)
-  })
-  
-  byCurrency['CAD'] = _.sortByOrder(byCurrency['CAD'], ['portfolioWeight'], ['desc'])
-  byCurrency['USD'] = _.sortByOrder(byCurrency['USD'], ['portfolioWeight'], ['desc'])
-
-  $('#cadPositions').html(templates['position-table-template']({positions: byCurrency['CAD'], balance: cash['CAD']}))
-  $('#usdPositions').html(templates['position-table-template']({positions: byCurrency['USD'], balance: cash['USD']}))
-}
-
 var benchmarkMap = {
   'TSX': 'TSX.IN',
   'NYSE': 'DJI.IN',
   'NASDAQ': 'COMP.IN'
 }
 
-function renderPositionDetails($position) {
-  function createIndexedData(series) {
-    _.each(series, function(datum) {
-      datum.end = moment(datum.end).toDate()
+function createIndexedData(series) {
+  _.each(series, function(datum) {
+    datum.end = moment(datum.end).toDate()
+  })
+  
+  var initialValue = Math.abs(series[0].open)
+  
+  _.each(series, function(datum) {
+    datum.index = datum.close/initialValue
+  })
+  
+  return series
+}
+
+function renderOverviews(accountId) {
+  var bmkMap = {
+    'CAD': 'TSX.IN',
+    'USD': 'DJI.IN'
+  }
+  
+  var endTime = moment()
+  var startTime = moment(endTime).subtract(1, 'y')
+  
+  $.getJSON('/api/accounts/'+accountId+'/historical_mv/?startTime='+startTime.format()+'&endTime='+endTime.format()+'&currency=CAD&interval=OneDay').then(function(resp) {
+    resp['CAD'] = createIndexedData(resp['CAD'])
+    resp['USD'] = createIndexedData(resp['USD'])
+    console.log('ACCOUNT', resp)
+  })
+  
+  $.getJSON('/api/symbols/search?prefix='+bmkMap['CAD']).then(function(resp) {
+    return $.getJSON('/api/markets/candles/'+resp.symbols[0].symbolId+'?startTime='+startTime.format()+'&endTime='+endTime.format()+'&interval=OneDay')
+  }).then(function(resp) {
+    var benchmarkPrices = createIndexedData(resp.candles)  
+    console.log('BENCHMARK', benchmarkPrices)
+  })
+
+  $.getJSON('/api/symbols/search?prefix='+bmkMap['USD']).then(function(resp) {
+    return $.getJSON('/api/markets/candles/'+resp.symbols[0].symbolId+'?startTime='+startTime.format()+'&endTime='+endTime.format()+'&interval=OneDay')
+  }).then(function(resp) {
+    var benchmarkPrices = createIndexedData(resp.candles)  
+    console.log('BENCHMARK', benchmarkPrices)
+  })
+}
+
+function renderPositionTables(accountId) {
+  function onPositionLoadComplete(positions, balances) {
+    var byCurrency = {}
+    
+    var cash = {}
+    _.each(balances.perCurrencyBalances, function(balance) {
+      balance.portfolioWeight = balance.cash / balance.marketValue
+      balance.cost = 0
+      balance.openPnl = 0
+      balance.percentageOpenPnl = 0
+      cash[balance.currency] = balance
     })
     
-    var initialValue = series[0].open
-    
-    _.each(series, function(datum) {
-      datum.index = datum.close/initialValue
+    _.each(positions, function(position) {
+      if (position.symbol.lastIndexOf('.TO') === -1) {
+        position.currency = 'USD'
+      } else {
+        position.currency = 'CAD'
+      }
     })
     
-    return series
+    _.each(positions, function(position) {
+      if (_.isUndefined(byCurrency[position.currency])) {
+        byCurrency[position.currency] = []
+      }
+      
+      position.percentageOpenPnl = position.openPnl / position.totalCost
+      position.percentageClosedPnl = position.closedPnl / position.totalCost
+      position.portfolioWeight = position.currentMarketValue / cash[position.currency].marketValue 
+      
+      cash[position.currency].cost += position.totalCost
+      cash[position.currency].openPnl = cash[position.currency].marketValue - cash[position.currency].cost
+      cash[position.currency].percentageOpenPnl = cash[position.currency].openPnl / cash[position.currency].cost
+      
+      byCurrency[position.currency].push(position)
+    })
+    
+    byCurrency['CAD'] = _.sortByOrder(byCurrency['CAD'], ['portfolioWeight'], ['desc'])
+    byCurrency['USD'] = _.sortByOrder(byCurrency['USD'], ['portfolioWeight'], ['desc'])
+
+    $('#cadPositions').html(templates['position-table-template']({positions: byCurrency['CAD'], balance: cash['CAD']}))
+    $('#usdPositions').html(templates['position-table-template']({positions: byCurrency['USD'], balance: cash['USD']}))
   }
 
+  $.when(
+    $.getJSON('/api/accounts/' + accountId + '/balances'),
+    $.getJSON('/api/accounts/' + accountId + '/positions')
+  ).then(function(r1, r2) {
+    var balances = r1[0]
+    var positions = r2[0].positions
+    
+    onPositionLoadComplete(positions, balances)
+  })
+}
+
+function renderPositionDetails($position) {
   var symbolId = $position.closest('a').data('symbolid')
 
   if ($('#symbol'+symbolId).length > 0) {
@@ -162,15 +204,8 @@ $(function() {
   $.getJSON('/api/accounts').then(function(resp) {
     var accountId = resp.accounts[0].number
 
-    $.when(
-      $.getJSON('/api/accounts/' + accountId + '/balances'),
-      $.getJSON('/api/accounts/' + accountId + '/positions')
-    ).then(function(r1, r2) {
-      var balances = r1[0]
-      var positions = r2[0].positions
-      
-      onSymbolLoadComplete(positions, balances)
-    })
+    renderOverviews(accountId)
+    renderPositionTables(accountId)
   })
   
   $('.position-container').on('click', 'a', function(e) {

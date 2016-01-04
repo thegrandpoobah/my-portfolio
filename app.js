@@ -34,8 +34,8 @@ function connectDatabase() {
 
   if (!exists) {
     db.serialize(function() {
-      db.run('CREATE TABLE mv (date INTEGER, currency TEXT, cash TEXT, marketValue TEXT, cost TEXT, openPnl TEXT)')
-      db.run('CREATE INDEX mv_fast ON mv (date, currency)')
+      db.run('CREATE TABLE mv (number INTEGER, date INTEGER, currency TEXT, cash TEXT, marketValue TEXT, cost TEXT)')
+      db.run('CREATE INDEX mv_fast ON mv (number, date)')
     })
   }
 
@@ -136,7 +136,7 @@ var app = express()
 var db = connectDatabase()
 
 app.get('/api/store_account_mv', function(req, res) {
-  function publishToDb(balances) {
+  function publishToDb(number, balances) {
     db.serialize(function() {
       var now = moment()
       now.millisecond(0)
@@ -144,33 +144,31 @@ app.get('/api/store_account_mv', function(req, res) {
       now.minute(0)
       now.hour(0)
       
-      var delStmt = db.prepare('DELETE FROM mv WHERE date = ?')
+      var delStmt = db.prepare('DELETE FROM mv WHERE number = ? AND date = ?')
       delStmt.run(now.unix())
       
       var insStmt = db.prepare('INSERT INTO mv VALUES(?, ?, ?, ?, ?, ?)')
       insStmt.run(
+        number, 
         now.unix(),
         'CAD',
         balances['CAD'].cash,
         balances['CAD'].marketValue,
-        balances['CAD'].cost,
-        balances['CAD'].openPnl)
+        balances['CAD'].cost)
       insStmt.run(
+        number,
         now.unix(),
         'USD',
         balances['USD'].cash,
         balances['USD'].marketValue,
-        balances['USD'].cost,
-        balances['USD'].openPnl)
+        balances['USD'].cost)
     })
   }
   
-  function storeDailyAccountMV(positions, balances) {
+  function storeDailyAccountMV(number, positions, balances) {
     var cash = {}
     _.each(balances.perCurrencyBalances, function(balance) {
       balance.cost = 0
-      balance.openPnl = 0
-      balance.percentageOpenPnl = 0
       cash[balance.currency] = balance
     })
     
@@ -184,11 +182,9 @@ app.get('/api/store_account_mv', function(req, res) {
     
     _.each(positions, function(position) {
       cash[position.currency].cost += position.totalCost
-      cash[position.currency].openPnl = cash[position.currency].marketValue - cash[position.currency].cost
-      cash[position.currency].percentageOpenPnl = cash[position.currency].openPnl / cash[position.currency].cost
     })
     
-    publishToDb(cash)
+    publishToDb(number, cash)
   }
   
   log('INFO', 'Performing sync of account data')
@@ -196,41 +192,43 @@ app.get('/api/store_account_mv', function(req, res) {
   qtAuthorize(Authorization).then(function(authorization) {
     return qtRequest(authorization, '/v1/accounts', true)
   }).then(function(resp) {
-    var accountId = resp.accounts[0].number
-    
-    Promise.all([
-      qtRequest(Authorization, '/v1/accounts/'+accountId+'/balances', true),
-      qtRequest(Authorization, '/v1/accounts/'+accountId+'/positions', true)
-    ]).then(function(resp) {
-      storeDailyAccountMV(resp[1].positions, resp[0])
+    _.each(resp.accounts, function(account) {
+      Promise.all([
+        qtRequest(Authorization, '/v1/accounts/'+account.number+'/balances', true),
+        qtRequest(Authorization, '/v1/accounts/'+account.number+'/positions', true)
+      ]).then(function(resp) {
+        storeDailyAccountMV(account.number, resp[1].positions, resp[0])
+      })
     })
   })
 
   res.status(204).send('{"acknowledged":true}')
 })
 
-app.get('/api/account_mv', function(req, res) {
+app.get('/api/accounts/:id/historical_mv', function(req, res) {
   log('INFO', 'Retrieving Historical Account MV')
   
   db.serialize(function() {
-    var mv = []
+    var mv = {'CAD': [], 'USD': []}
     
     var startTime = moment(req.query.startTime).unix()
     var endTime = moment(req.query.endTime).unix()
-    var currency = req.query.currency
     
-    db.each('SELECT * FROM mv WHERE date >= ? AND date <= ? AND currency = ?', startTime, endTime, currency, function(err, row) {
-      mv.push(row)
+    db.each('SELECT * FROM mv WHERE number = ? AND date >= ? AND date <= ?', req.params.id, startTime, endTime, function(err, row) {
+      mv[row.currency].push(row)
     }, function() {
-      _.each(mv, function(row) {
-        row.date = moment.unix(row.date)
-        row.cash = Number.parseFloat(row.cash)
-        row.marketValue = Number.parseFloat(row.marketValue)
-        row.cost = Number.parseFloat(row.cost)
-        row.openPnl = Number.parseFloat(row.openPnl)
-      })
+      function transformRow(row) {
+        return {
+          end: moment.unix(row.date).format(),
+          open: Number.parseFloat(row.marketValue)/Number.parseFloat(row.cost),
+          close: Number.parseFloat(row.marketValue)/Number.parseFloat(row.cost)
+        }
+      }
       
-      res.json({mv: mv})
+      mv['CAD'] = _.map(mv['CAD'], transformRow)
+      mv['USD'] = _.map(mv['USD'], transformRow)
+      
+      res.json(mv)
     })
   })
 })
