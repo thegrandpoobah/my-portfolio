@@ -19,6 +19,8 @@ var Authorization = JSON.parse(fs.readFileSync('authorization.json', 'utf8'));
 var LogLevel = 'DEBUG'
 var DatabaseFile = 'mv.db'
 
+var authorizationPromise = null
+
 function log(level) {
   if (LogLevels[level] >= LogLevels[LogLevel]) {
     args = _.toArray(arguments)
@@ -43,55 +45,67 @@ function connectDatabase() {
 }
 
 function qtAuthorize(auth) {
-  return new Promise(function(resolve, reject) {
-    if (!auth.generation_time || moment().diff(moment(auth.generation_time, moment.ISO_8601), 'seconds') > auth.expires_in) {
-      log('INFO', 'Requesting Authorization from Questrade')
-      
-      // authorizing request
-      var opts = {
-        host: 'login.questrade.com',
-        path: '/oauth2/token?grant_type=refresh_token&refresh_token='+auth.refresh_token,
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
+  if (authorizationPromise != null) {
+    return authorizationPromise
+  }
+  
+  function internal() {
+    return new Promise(function(resolve, reject) {
+      if (!auth.generation_time || moment().diff(moment(auth.generation_time, moment.ISO_8601), 'seconds') > auth.expires_in) {
+        log('INFO', 'Requesting Authorization from Questrade', auth.refresh_token)
+        
+        // authorizing request
+        var opts = {
+          host: 'login.questrade.com',
+          path: '/oauth2/token?grant_type=refresh_token&refresh_token='+auth.refresh_token,
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          }
         }
-      }
-      
-      var req = https.request(opts, function(res) {
-        var responseString = ''
         
-        res.on('data', function(data) {
-          responseString += data
-        })
-        
-        res.on('end', function() {
-          var a = JSON.parse(responseString)
+        var req = https.request(opts, function(res) {
+          var responseString = ''
           
-          a.generation_time = moment().toISOString()
+          res.on('data', function(data) {
+            responseString += data
+          })
           
-          var serverUrl = url.parse(a.api_server)
-          a.api_server = serverUrl.host
-          authorization = a
+          res.on('end', function() {
+            var a = JSON.parse(responseString)
+            
+            a.generation_time = moment().toISOString()
+            
+            var serverUrl = url.parse(a.api_server)
+            a.api_server = serverUrl.host
+            Authorization = a
+            
+            fs.writeFile('authorization.json', JSON.stringify(a), function(err) {
+              authorizationPromise = null
+              if (err) {
+                reject(err)
+              } else {
+                resolve(a)
+              }
+            })
+          })
           
-          fs.writeFile('authorization.json', JSON.stringify(a), function(err) {
-            if (err) {
-              reject(err)
-            } else {
-              resolve(a)
-            }
+          res.on('error', function(e) {
+            authorizationPromise = null
+            reject(e)
           })
         })
         
-        res.on('error', function(e) {
-          reject(e)
-        })
-      })
-      
-      req.end()
-    } else {
-      resolve(auth)
-    }
-  })
+        req.end()
+      } else {
+        authorizationPromise = null
+        resolve(auth)
+      }
+    })
+  }
+  
+  authorizationPromise = internal()
+  return authorizationPromise
 }
 
 function qtRequest(auth, endpoint, asObject) {
