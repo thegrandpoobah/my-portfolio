@@ -16,6 +16,7 @@ function createIndexedData(series) {
   _.each(series, function(datum) {
     datum.index = datum.close/initialValue
   })
+  series[0].index = 1
   
   return series
 }
