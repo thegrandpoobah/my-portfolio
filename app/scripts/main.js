@@ -195,9 +195,9 @@ function renderPositionDetails($position) {
 }
 
 $(function() {
-  templates['position-table-template'] = Handlebars.compile($('#position-table-template').html())
-  templates['position-details-container-template'] = Handlebars.compile($('#position-details-container-template').html())
-  templates['position-details-template'] = Handlebars.compile($('#position-details-template').html())
+  $('script[type="text/x-handlerbars-template"]').each(function(i, elem) {
+    templates[elem.id] = Handlebars.compile($(elem).html())
+  })
   
   Handlebars.registerHelper({
     'currency': function(amount) {
