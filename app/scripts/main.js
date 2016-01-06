@@ -20,28 +20,24 @@ function createIndexedData(series) {
   return series
 }
 
+function renderLoadingGraph(target) {
+  MG.data_graphic({
+    chart_type: 'missing-data',
+    missing_text: 'Loading...',
+    target: target,
+    full_width: true,
+    height: 400
+  })
+}
+
 function renderOverviews(accountId) {
   var bmkMap = {
     'CAD': 'TSX.IN',
     'USD': 'DJI.IN'
   }
   
-  MG.data_graphic({
-    title: 'Portfolio vs ' + bmkMap['CAD'],
-    chart_type: 'missing-data',
-    missing_text: 'Loading...',
-    target: '#cadOverview .chart-container',
-    full_width: true,
-    height: 400
-  })
-  MG.data_graphic({
-    title: 'Portfolio vs ' + bmkMap['USD'],
-    chart_type: 'missing-data',
-    missing_text: 'Loading...',
-    target: '#usdOverview .chart-container',
-    full_width: true,
-    height: 400
-  })
+  renderLoadingGraph('#cadOverview .chart-container')
+  renderLoadingGraph('#usdOverview .chart-container')
 
   var endTime = moment()
   var startTime = moment(endTime).subtract(1, 'y')
@@ -134,12 +130,11 @@ function renderPositionTables(accountId) {
       
       byCurrency[position.currency].push(position)
     })
-    
-    byCurrency['CAD'] = _.sortByOrder(byCurrency['CAD'], ['portfolioWeight'], ['desc'])
-    byCurrency['USD'] = _.sortByOrder(byCurrency['USD'], ['portfolioWeight'], ['desc'])
 
-    $('#cadPositions').html(templates['position-table-template']({positions: byCurrency['CAD'], balance: cash['CAD']}))
-    $('#usdPositions').html(templates['position-table-template']({positions: byCurrency['USD'], balance: cash['USD']}))
+    _.each(['CAD', 'USD'], function(cur) {
+      byCurrency[cur] = _.sortByOrder(byCurrency[cur], ['portfolioWeight'], ['desc'])
+      $('#'+cur.toLowerCase()+'Positions').html(templates['position-table-template']({positions: byCurrency[cur], balance: cash[cur]}))
+    })
   }
 
   $.when(
@@ -170,14 +165,7 @@ function renderPositionDetails($position) {
 
     $('#symbol'+symbolId+' .sidebar-container').html(templates['position-details-template'](stockInfo))
 
-    MG.data_graphic({
-      title: stockInfo.symbol + ' vs ' + benchmarkMap[stockInfo.listingExchange],
-      chart_type: 'missing-data',
-      missing_text: 'Loading...',
-      target: '#symbol'+symbolId+' .chart-container',
-      full_width: true,
-      height: 400
-    })
+    renderLoadingGraph('#symbol'+symbolId+' .chart-container')
   })
   
   var endTime = moment()
@@ -215,8 +203,13 @@ function renderPositionDetails($position) {
     })
   })
   
-  $position.closest('tr').after(templates['position-details-container-template']({symbolId: symbolId}))
-  $position.closest('a').find('.glyphicon').removeClass('glyphicon-menu-right').addClass('glyphicon-menu-down')
+  $position
+    .closest('a').find('.glyphicon')
+      .removeClass('glyphicon-menu-right')
+      .addClass('glyphicon-menu-down')
+      .end()
+    .closest('tr')
+      .after(templates['position-details-container-template']({symbolId: symbolId}))
 }
 
 $(function() {
