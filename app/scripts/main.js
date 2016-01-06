@@ -21,6 +21,12 @@ function createIndexedData(series) {
   return series
 }
 
+function findBenchmarkPrices(symbol, startTime, endTime) {
+  return $.getJSON('/api/symbols/search?prefix='+symbol).then(function(resp) {
+    return $.getJSON('/api/markets/candles/'+resp.symbols[0].symbolId+'?startTime='+startTime.format()+'&endTime='+endTime.format()+'&interval=OneDay')
+  })
+}
+
 function renderLoadingGraph(target) {
   MG.data_graphic({
     chart_type: 'missing-data',
@@ -66,9 +72,7 @@ function renderOverviews(accountId) {
     _.each(['CAD', 'USD'], function(cur) {
       var portfolioPrices = createIndexedData(resp[cur])
 
-      $.getJSON('/api/symbols/search?prefix='+bmkMap['CAD']).then(function(resp) {
-        return $.getJSON('/api/markets/candles/'+resp.symbols[0].symbolId+'?startTime='+startTime.format()+'&endTime='+endTime.format()+'&interval=OneDay')
-      }).then(function(resp) {
+      findBenchmarkPrices(bmkMap['CAD'], startTime, endTime).then(function(resp) {
         renderGraph('#'+cur.toLowerCase()+'Overview .chart-container', '#'+cur.toLowerCase()+'Overview .legend-container', [
           {
             name: 'Portfolio',
@@ -169,9 +173,7 @@ function renderPositionDetails($position) {
 
     var stockPrices = createIndexedData(r2[0].candles)
     
-    $.getJSON('/api/symbols/search?prefix='+benchmarkMap[stockInfo.listingExchange]).then(function(resp) {
-      return $.getJSON('/api/markets/candles/'+resp.symbols[0].symbolId+'?startTime='+startTime.format()+'&endTime='+endTime.format()+'&interval=OneDay')
-    }).then(function(resp) {
+    findBenchmarkPrices(benchmarkMap[stockInfo.listingExchange], startTime, endTime).then(function(resp) {
       renderGraph('#symbol'+symbolId+' .chart-container', '#symbol'+symbolId+' .legend-container', [
         {
           name: stockInfo.symbol,
