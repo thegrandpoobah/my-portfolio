@@ -26,27 +26,75 @@ function renderOverviews(accountId) {
     'USD': 'DJI.IN'
   }
   
+  MG.data_graphic({
+    title: 'Portfolio vs ' + bmkMap['CAD'],
+    chart_type: 'missing-data',
+    missing_text: 'Loading...',
+    target: '#cadOverview .chart-container',
+    full_width: true,
+    height: 400
+  })
+  MG.data_graphic({
+    title: 'Portfolio vs ' + bmkMap['USD'],
+    chart_type: 'missing-data',
+    missing_text: 'Loading...',
+    target: '#usdOverview .chart-container',
+    full_width: true,
+    height: 400
+  })
+
   var endTime = moment()
   var startTime = moment(endTime).subtract(1, 'y')
   
   $.getJSON('/api/accounts/'+accountId+'/historical_mv/?startTime='+startTime.format()+'&endTime='+endTime.format()+'&currency=CAD&interval=OneDay').then(function(resp) {
-    resp['CAD'] = createIndexedData(resp['CAD'])
-    resp['USD'] = createIndexedData(resp['USD'])
-    console.log('ACCOUNT', resp)
-  })
-  
-  $.getJSON('/api/symbols/search?prefix='+bmkMap['CAD']).then(function(resp) {
-    return $.getJSON('/api/markets/candles/'+resp.symbols[0].symbolId+'?startTime='+startTime.format()+'&endTime='+endTime.format()+'&interval=OneDay')
-  }).then(function(resp) {
-    var benchmarkPrices = createIndexedData(resp.candles)  
-    console.log('BENCHMARK', benchmarkPrices)
-  })
+    var cadPrices = createIndexedData(resp['CAD'])
+    var usdPrices = createIndexedData(resp['USD'])
 
-  $.getJSON('/api/symbols/search?prefix='+bmkMap['USD']).then(function(resp) {
-    return $.getJSON('/api/markets/candles/'+resp.symbols[0].symbolId+'?startTime='+startTime.format()+'&endTime='+endTime.format()+'&interval=OneDay')
-  }).then(function(resp) {
-    var benchmarkPrices = createIndexedData(resp.candles)  
-    console.log('BENCHMARK', benchmarkPrices)
+    $.getJSON('/api/symbols/search?prefix='+bmkMap['CAD']).then(function(resp) {
+      return $.getJSON('/api/markets/candles/'+resp.symbols[0].symbolId+'?startTime='+startTime.format()+'&endTime='+endTime.format()+'&interval=OneDay')
+    }).then(function(resp) {
+      var benchmarkPrices = createIndexedData(resp.candles)  
+
+      MG.data_graphic({
+        title: 'Portfolio vs ' + bmkMap['CAD'],
+        data: [cadPrices, benchmarkPrices],
+        colors: ['blue', 'red'],
+        full_width: true,
+        height: 400,
+        target: '#cadOverview .chart-container',
+        x_accessor: 'end',
+        y_accessor: 'index',
+        min_y_from_data: true,
+        legend: ['Portfolio', bmkMap['CAD']],
+        legend_target: '#cadOverview .legend-container',
+        aggregate_rollover: true,
+        format: 'percentage',
+        baselines: [{value: 1, label: '100%'}]
+      })
+    })
+    
+    $.getJSON('/api/symbols/search?prefix='+bmkMap['USD']).then(function(resp) {
+      return $.getJSON('/api/markets/candles/'+resp.symbols[0].symbolId+'?startTime='+startTime.format()+'&endTime='+endTime.format()+'&interval=OneDay')
+    }).then(function(resp) {
+      var benchmarkPrices = createIndexedData(resp.candles)  
+
+      MG.data_graphic({
+        title: 'Portfolio vs ' + bmkMap['USD'],
+        data: [usdPrices, benchmarkPrices],
+        colors: ['blue', 'red'],
+        full_width: true,
+        height: 400,
+        target: '#usdOverview .chart-container',
+        x_accessor: 'end',
+        y_accessor: 'index',
+        min_y_from_data: true,
+        legend: ['Portfolio', bmkMap['USD']],
+        legend_target: '#usdOverview .legend-container',
+        aggregate_rollover: true,
+        format: 'percentage',
+        baselines: [{value: 1, label: '100%'}]
+      })
+    })   
   })
 }
 
