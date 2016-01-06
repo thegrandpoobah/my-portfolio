@@ -30,6 +30,25 @@ function renderLoadingGraph(target) {
   })
 }
 
+function renderGraph(chartTarget, legendTarget, dataSeries) {
+  MG.data_graphic({
+    title: dataSeries[0].name + ' vs ' + dataSeries[1].name,
+    data: _.pluck(dataSeries, 'prices'),
+    colors: ['blue', 'red'],
+    full_width: true,
+    height: 400,
+    target: chartTarget,
+    x_accessor: 'end',
+    y_accessor: 'index',
+    min_y_from_data: true,
+    legend: _.pluck(dataSeries, 'name'),
+    legend_target: legendTarget,
+    aggregate_rollover: true,
+    format: 'percentage',
+    baselines: [{value: 1, label: '100%'}]
+  })  
+}
+
 function renderOverviews(accountId) {
   var bmkMap = {
     'CAD': 'TSX.IN',
@@ -49,47 +68,31 @@ function renderOverviews(accountId) {
     $.getJSON('/api/symbols/search?prefix='+bmkMap['CAD']).then(function(resp) {
       return $.getJSON('/api/markets/candles/'+resp.symbols[0].symbolId+'?startTime='+startTime.format()+'&endTime='+endTime.format()+'&interval=OneDay')
     }).then(function(resp) {
-      var benchmarkPrices = createIndexedData(resp.candles)  
-
-      MG.data_graphic({
-        title: 'Portfolio vs ' + bmkMap['CAD'],
-        data: [cadPrices, benchmarkPrices],
-        colors: ['blue', 'red'],
-        full_width: true,
-        height: 400,
-        target: '#cadOverview .chart-container',
-        x_accessor: 'end',
-        y_accessor: 'index',
-        min_y_from_data: true,
-        legend: ['Portfolio', bmkMap['CAD']],
-        legend_target: '#cadOverview .legend-container',
-        aggregate_rollover: true,
-        format: 'percentage',
-        baselines: [{value: 1, label: '100%'}]
-      })
+      renderGraph('#cadOverview .chart-container', '#cadOverview .legend-container', [
+        {
+          name: 'Portfolio',
+          prices: cadPrices
+        },
+        {
+          name: bmkMap['CAD'],
+          prices: createIndexedData(resp.candles)
+        }
+      ])
     })
     
     $.getJSON('/api/symbols/search?prefix='+bmkMap['USD']).then(function(resp) {
       return $.getJSON('/api/markets/candles/'+resp.symbols[0].symbolId+'?startTime='+startTime.format()+'&endTime='+endTime.format()+'&interval=OneDay')
     }).then(function(resp) {
-      var benchmarkPrices = createIndexedData(resp.candles)  
-
-      MG.data_graphic({
-        title: 'Portfolio vs ' + bmkMap['USD'],
-        data: [usdPrices, benchmarkPrices],
-        colors: ['blue', 'red'],
-        full_width: true,
-        height: 400,
-        target: '#usdOverview .chart-container',
-        x_accessor: 'end',
-        y_accessor: 'index',
-        min_y_from_data: true,
-        legend: ['Portfolio', bmkMap['USD']],
-        legend_target: '#usdOverview .legend-container',
-        aggregate_rollover: true,
-        format: 'percentage',
-        baselines: [{value: 1, label: '100%'}]
-      })
+      renderGraph('#usdOverview .chart-container', '#usdOverview .legend-container', [
+        {
+          name: 'Portfolio',
+          prices: usdPrices
+        },
+        {
+          name: bmkMap['USD'],
+          prices: createIndexedData(resp.candles)
+        }
+      ])
     })   
   })
 }
@@ -182,24 +185,16 @@ function renderPositionDetails($position) {
     $.getJSON('/api/symbols/search?prefix='+benchmarkMap[stockInfo.listingExchange]).then(function(resp) {
       return $.getJSON('/api/markets/candles/'+resp.symbols[0].symbolId+'?startTime='+startTime.format()+'&endTime='+endTime.format()+'&interval=OneDay')
     }).then(function(resp) {
-      var benchmarkPrices = createIndexedData(resp.candles)
-
-      MG.data_graphic({
-        title: stockInfo.symbol + ' vs ' + benchmarkMap[stockInfo.listingExchange],
-        data: [stockPrices, benchmarkPrices],
-        colors: ['blue', 'red'],
-        full_width: true,
-        height: 400,
-        target: '#symbol'+symbolId+' .chart-container',
-        x_accessor: 'end',
-        y_accessor: 'index',
-        min_y_from_data: true,
-        legend: [stockInfo.symbol, benchmarkMap[stockInfo.listingExchange]],
-        legend_target: '#symbol'+symbolId+' .legend-container',
-        aggregate_rollover: true,
-        format: 'percentage',
-        baselines: [{value: 1, label: '100%'}]
-      })
+      renderGraph('#symbol'+symbolId+' .chart-container', '#symbol'+symbolId+' .legend-container', [
+        {
+          name: stockInfo.symbol,
+          prices: cadPrices
+        },
+        {
+          name: benchmarkMap[stockInfo.listingExchange],
+          prices: createIndexedData(resp.candles)
+        }
+      ])
     })
   })
   
