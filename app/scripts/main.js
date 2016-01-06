@@ -62,38 +62,24 @@ function renderOverviews(accountId) {
   var startTime = moment(endTime).subtract(1, 'y')
   
   $.getJSON('/api/accounts/'+accountId+'/historical_mv/?startTime='+startTime.format()+'&endTime='+endTime.format()+'&currency=CAD&interval=OneDay').then(function(resp) {
-    var cadPrices = createIndexedData(resp['CAD'])
-    var usdPrices = createIndexedData(resp['USD'])
+    _.each(['CAD', 'USD'], function(cur) {
+      var portfolioPrices = createIndexedData(resp[cur])
 
-    $.getJSON('/api/symbols/search?prefix='+bmkMap['CAD']).then(function(resp) {
-      return $.getJSON('/api/markets/candles/'+resp.symbols[0].symbolId+'?startTime='+startTime.format()+'&endTime='+endTime.format()+'&interval=OneDay')
-    }).then(function(resp) {
-      renderGraph('#cadOverview .chart-container', '#cadOverview .legend-container', [
-        {
-          name: 'Portfolio',
-          prices: cadPrices
-        },
-        {
-          name: bmkMap['CAD'],
-          prices: createIndexedData(resp.candles)
-        }
-      ])
+      $.getJSON('/api/symbols/search?prefix='+bmkMap['CAD']).then(function(resp) {
+        return $.getJSON('/api/markets/candles/'+resp.symbols[0].symbolId+'?startTime='+startTime.format()+'&endTime='+endTime.format()+'&interval=OneDay')
+      }).then(function(resp) {
+        renderGraph('#'+cur.toLowerCase()+'Overview .chart-container', '#'+cur.toLowerCase()+'Overview .legend-container', [
+          {
+            name: 'Portfolio',
+            prices: portfolioPrices
+          },
+          {
+            name: bmkMap[cur],
+            prices: createIndexedData(resp.candles)
+          }
+        ])
+      })
     })
-    
-    $.getJSON('/api/symbols/search?prefix='+bmkMap['USD']).then(function(resp) {
-      return $.getJSON('/api/markets/candles/'+resp.symbols[0].symbolId+'?startTime='+startTime.format()+'&endTime='+endTime.format()+'&interval=OneDay')
-    }).then(function(resp) {
-      renderGraph('#usdOverview .chart-container', '#usdOverview .legend-container', [
-        {
-          name: 'Portfolio',
-          prices: usdPrices
-        },
-        {
-          name: bmkMap['USD'],
-          prices: createIndexedData(resp.candles)
-        }
-      ])
-    })   
   })
 }
 
@@ -188,7 +174,7 @@ function renderPositionDetails($position) {
       renderGraph('#symbol'+symbolId+' .chart-container', '#symbol'+symbolId+' .legend-container', [
         {
           name: stockInfo.symbol,
-          prices: cadPrices
+          prices: stockPrices
         },
         {
           name: benchmarkMap[stockInfo.listingExchange],
