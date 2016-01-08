@@ -6,6 +6,7 @@ var fs = require('fs')
 var url = require('url')
 var _ = require('lodash')
 var sqlite3 = require('sqlite3')
+var questrade = require('./questrade')
 
 var LogLevels = {
   DEBUG: 0,
@@ -15,11 +16,8 @@ var LogLevels = {
   CRITICAL: 4
 }
 
-var Authorization = JSON.parse(fs.readFileSync('authorization.json', 'utf8'))
 var LogLevel = 'DEBUG'
 var DatabaseFile = 'mv.db'
-
-var authorizationPromise = null
 
 function log (level) {
   if (LogLevels[level] >= LogLevels[LogLevel]) {
@@ -42,108 +40,6 @@ function connectDatabase () {
   }
 
   return db
-}
-
-function qtAuthorize (auth) {
-  if (authorizationPromise != null) {
-    return authorizationPromise
-  }
-
-  function internal () {
-    return new Promise(function (resolve, reject) {
-      if (!auth.generation_time || moment().diff(moment(auth.generation_time, moment.ISO_8601), 'seconds') > auth.expires_in) {
-        log('INFO', 'Requesting Authorization from Questrade', auth.refresh_token)
-
-        // authorizing request
-        var opts = {
-          host: 'login.questrade.com',
-          path: '/oauth2/token?grant_type=refresh_token&refresh_token=' + auth.refresh_token,
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        }
-
-        var req = https.request(opts, function (res) {
-          var responseString = ''
-
-          res.on('data', function (data) {
-            responseString += data
-          })
-
-          res.on('end', function () {
-            var a = JSON.parse(responseString)
-
-            a.generation_time = moment().toISOString()
-
-            var serverUrl = url.parse(a.api_server)
-            a.api_server = serverUrl.host
-            Authorization = a
-
-            fs.writeFile('authorization.json', JSON.stringify(a), function (err) {
-              authorizationPromise = null
-              if (err) {
-                reject(err)
-              } else {
-                resolve(a)
-              }
-            })
-          })
-
-          res.on('error', function (e) {
-            authorizationPromise = null
-            reject(e)
-          })
-        })
-
-        req.end()
-      } else {
-        authorizationPromise = null
-        resolve(auth)
-      }
-    })
-  }
-
-  authorizationPromise = internal()
-  return authorizationPromise
-}
-
-function qtRequest (auth, endpoint, asObject) {
-  return new Promise(function (resolve, reject) {
-    log('INFO', 'Making Data Request to Questrade', endpoint)
-
-    var opts = {
-      host: auth.api_server,
-      path: endpoint,
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': auth.token_type + ' ' + auth.access_token
-      }
-    }
-
-    var req = https.request(opts, function (res) {
-      var responseString = ''
-
-      res.on('data', function (data) {
-        responseString += data
-      })
-
-      res.on('end', function () {
-        if (asObject) {
-          resolve(JSON.parse(responseString))
-        } else {
-          resolve(responseString)
-        }
-      })
-
-      res.on('error', function (e) {
-        reject(e)
-      })
-    })
-
-    req.end()
-  })
 }
 
 var app = express()
@@ -198,13 +94,16 @@ app.get('/api/store_account_mv', function (req, res) {
 
   log('INFO', 'Performing sync of account data')
 
-  qtAuthorize(Authorization).then(function (authorization) {
-    return qtRequest(authorization, '/v1/accounts', true)
+  var auth
+
+  questrade.authorize(undefined).then(function (authorization) {
+    auth = authorization
+    return questrade.request(authorization, '/v1/accounts', true)
   }).then(function (resp) {
     _.each(resp.accounts, function (account) {
       Promise.all([
-        qtRequest(Authorization, '/v1/accounts/' + account.number + '/balances', true),
-        qtRequest(Authorization, '/v1/accounts/' + account.number + '/positions', true)
+        questrade.request(auth, '/v1/accounts/' + account.number + '/balances', true),
+        questrade.request(auth, '/v1/accounts/' + account.number + '/positions', true)
       ]).then(function (resp) {
         storeDailyAccountMV(account.number, resp[1].positions, resp[0])
       })
@@ -247,8 +146,8 @@ app.get('/api/accounts/:id/historical_mv', function (req, res) {
 })
 
 app.get('/api/*', function (req, res) {
-  qtAuthorize(Authorization).then(function (authorization) {
-    return qtRequest(authorization, '/v1' + req.originalUrl.substr(4), false)
+  questrade.authorize(undefined).then(function (authorization) {
+    return questrade.request(authorization, '/v1' + req.originalUrl.substr(4), false)
   }).then(function (resp) {
     log('DEBUG', resp)
     res.set({
