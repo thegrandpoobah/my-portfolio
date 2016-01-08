@@ -1,9 +1,7 @@
-var https = require('https')
 var Promise = require('bluebird')
 var express = require('express')
 var moment = require('moment')
 var fs = require('fs')
-var url = require('url')
 var _ = require('lodash')
 var sqlite3 = require('sqlite3')
 var questrade = require('./questrade')
@@ -94,16 +92,11 @@ app.get('/api/store_account_mv', function (req, res) {
 
   log('INFO', 'Performing sync of account data')
 
-  var auth
-
-  questrade.authorize(undefined).then(function (authorization) {
-    auth = authorization
-    return questrade.request(authorization, '/v1/accounts', true)
-  }).then(function (resp) {
+  questrade.request('/v1/accounts', true).then(function (resp) {
     _.each(resp.accounts, function (account) {
       Promise.all([
-        questrade.request(auth, '/v1/accounts/' + account.number + '/balances', true),
-        questrade.request(auth, '/v1/accounts/' + account.number + '/positions', true)
+        questrade.request('/v1/accounts/' + account.number + '/balances', true),
+        questrade.request('/v1/accounts/' + account.number + '/positions', true)
       ]).then(function (resp) {
         storeDailyAccountMV(account.number, resp[1].positions, resp[0])
       })
@@ -146,9 +139,7 @@ app.get('/api/accounts/:id/historical_mv', function (req, res) {
 })
 
 app.get('/api/*', function (req, res) {
-  questrade.authorize(undefined).then(function (authorization) {
-    return questrade.request(authorization, '/v1' + req.originalUrl.substr(4), false)
-  }).then(function (resp) {
+  questrade.request('/v1' + req.originalUrl.substr(4), false).then(function (resp) {
     log('DEBUG', resp)
     res.set({
       'Content-Type': 'application/json'

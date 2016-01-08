@@ -9,12 +9,12 @@ var Authorization = JSON.parse(fs.readFileSync('authorization.json', 'utf8'))
 
 var authorizationPromise = null
 
-function qtAuthorize (auth) {
+function qtAuthorize () {
   if (authorizationPromise != null) {
     return authorizationPromise
   }
 
-  auth = auth || Authorization
+  var auth = Authorization
 
   function internal () {
     return new Promise(function (resolve, reject) {
@@ -117,6 +117,9 @@ function qtRequest (auth, endpoint, asObject) {
 }
 
 module.exports = {
-  authorize: qtAuthorize,
-  request: qtRequest
+  request: function (endpoint, asObject) {
+    return qtAuthorize().then(function (auth) {
+      return qtRequest(auth, endpoint, asObject)
+    })
+  }
 }
