@@ -1,10 +1,9 @@
 var Promise = require('bluebird')
 var express = require('express')
 var moment = require('moment')
-var fs = require('fs')
 var _ = require('lodash')
-var sqlite3 = require('sqlite3')
 var questrade = require('./questrade')
+var db = require('./db').connect()
 
 var LogLevels = {
   DEBUG: 0,
@@ -15,7 +14,6 @@ var LogLevels = {
 }
 
 var LogLevel = 'DEBUG'
-var DatabaseFile = 'mv.db'
 
 function log (level) {
   if (LogLevels[level] >= LogLevels[LogLevel]) {
@@ -26,22 +24,7 @@ function log (level) {
   }
 }
 
-function connectDatabase () {
-  var exists = fs.existsSync(DatabaseFile)
-  var db = new sqlite3.Database(DatabaseFile)
-
-  if (!exists) {
-    db.serialize(function () {
-      db.run('CREATE TABLE mv (number INTEGER, date INTEGER, currency TEXT, cash TEXT, marketValue TEXT, cost TEXT)')
-      db.run('CREATE INDEX mv_fast ON mv (number, date)')
-    })
-  }
-
-  return db
-}
-
 var app = express()
-var db = connectDatabase()
 
 app.get('/api/store_account_mv', function (req, res) {
   function publishToDb (number, balances) {
