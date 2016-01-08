@@ -8,69 +8,6 @@ var db = require('./db').connect()
 
 var app = express()
 
-app.get('/api/store_account_mv', function (req, res) {
-  function publishToDb (number, balances) {
-    db.serialize(function () {
-      var now = moment()
-      now.millisecond(0)
-      now.second(0)
-      now.minute(0)
-      now.hour(0)
-
-      var delStmt = db.prepare('DELETE FROM mv WHERE number = ? AND date = ?')
-      delStmt.run(number, now.unix())
-
-      var insStmt = db.prepare('INSERT INTO mv VALUES(?, ?, ?, ?, ?, ?)')
-      _.each(['CAD', 'USD'], function (cur) {
-        insStmt.run(
-          number,
-          now.unix(),
-          cur,
-          balances[cur].cash,
-          balances[cur].marketValue,
-          balances[cur].cost)
-      })
-    })
-  }
-
-  function storeDailyAccountMV (number, positions, balances) {
-    var cash = {}
-    _.each(balances.perCurrencyBalances, function (balance) {
-      balance.cost = 0
-      cash[balance.currency] = balance
-    })
-
-    _.each(positions, function (position) {
-      if (position.symbol.lastIndexOf('.TO') === -1) {
-        position.currency = 'USD'
-      } else {
-        position.currency = 'CAD'
-      }
-    })
-
-    _.each(positions, function (position) {
-      cash[position.currency].cost += position.totalCost
-    })
-
-    publishToDb(number, cash)
-  }
-
-  log.info('sync', 'Starting sync of account data')
-
-  questrade.request('/v1/accounts', true).then(function (resp) {
-    _.each(resp.accounts, function (account) {
-      Promise.all([
-        questrade.request('/v1/accounts/' + account.number + '/balances', true),
-        questrade.request('/v1/accounts/' + account.number + '/positions', true)
-      ]).then(function (resp) {
-        storeDailyAccountMV(account.number, resp[1].positions, resp[0])
-      })
-    })
-  })
-
-  res.status(204).send('{"acknowledged":true}')
-})
-
 app.get('/api/accounts/:id/historical_mv', function (req, res) {
   db.serialize(function () {
     var mv = {'CAD': [], 'USD': []}
