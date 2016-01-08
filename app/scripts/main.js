@@ -72,7 +72,7 @@ function renderOverviews(accountId) {
     _.each(['CAD', 'USD'], function(cur) {
       var portfolioPrices = createIndexedData(resp[cur])
 
-      findBenchmarkPrices(bmkMap['CAD'], startTime, endTime).then(function(resp) {
+      findBenchmarkPrices(bmkMap[cur], startTime, endTime).then(function(resp) {
         renderGraph('#'+cur.toLowerCase()+'Overview .chart-container', '#'+cur.toLowerCase()+'Overview .legend-container', [
           {
             name: 'Portfolio',
