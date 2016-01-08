@@ -1,4 +1,3 @@
-var Promise = require('bluebird')
 var express = require('express')
 var moment = require('moment')
 var _ = require('lodash')
@@ -8,33 +7,45 @@ var db = require('./db').connect()
 
 var app = express()
 
-app.get('/api/accounts/:id/historical_mv', function (req, res) {
-  db.serialize(function () {
-    var mv = {'CAD': [], 'USD': []}
+app.get('/api/accounts/:id/candles', function (req, res) {
+  var startTime = moment(req.query.startTime).unix()
+  var endTime = moment(req.query.endTime).unix()
 
-    var startTime = moment(req.query.startTime).unix()
-    var endTime = moment(req.query.endTime).unix()
+  var responded = false
+  var mv = {}
 
-    db.each('SELECT * FROM mv WHERE number = ? AND date >= ? AND date <= ?', req.params.id, startTime, endTime, function (err, row) {
-      if (err) {
-        // TODO: Do something here
-        return
-      }
-      mv[row.currency].push(row)
-    }, function () {
-      function transformRow (row) {
+  db.each('SELECT * FROM mv WHERE number = ? AND date >= ? AND date <= ?', req.params.id, startTime, endTime, function (err, row) {
+    if (err) {
+      res.status(500).json(err)
+      responded = true
+      return
+    }
+
+    if (!mv[row.currency]) {
+      mv[row.currency] = []
+    }
+    mv[row.currency].push(row)
+  }, function (err) {
+    if (responded) {
+      return
+    }
+
+    if (err) {
+      res.status(500).json(err)
+      return
+    }
+
+    _.forEach(mv, function (val, key) {
+      mv[key] = _.map(val, function (row) {
         return {
           end: moment.unix(row.date).format(),
           open: Number.parseFloat(row.marketValue) / Number.parseFloat(row.cost),
           close: Number.parseFloat(row.marketValue) / Number.parseFloat(row.cost)
         }
-      }
-
-      mv['CAD'] = _.map(mv['CAD'], transformRow)
-      mv['USD'] = _.map(mv['USD'], transformRow)
-
-      res.json(mv)
+      })
     })
+
+    res.json(mv)
   })
 })
 

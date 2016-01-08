@@ -68,7 +68,7 @@ function renderOverviews(accountId) {
   var endTime = moment()
   var startTime = moment(endTime).subtract(1, 'y')
   
-  $.getJSON('/api/accounts/'+accountId+'/historical_mv/?startTime='+startTime.format()+'&endTime='+endTime.format()+'&currency=CAD&interval=OneDay').then(function(resp) {
+  $.getJSON('/api/accounts/'+accountId+'/candles?startTime='+startTime.format()+'&endTime='+endTime.format()+'&currency=CAD&interval=OneDay').then(function(resp) {
     _.each(['CAD', 'USD'], function(cur) {
       var portfolioPrices = createIndexedData(resp[cur])
 
