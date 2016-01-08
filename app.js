@@ -162,20 +162,15 @@ app.get('/api/store_account_mv', function (req, res) {
       delStmt.run(number, now.unix())
 
       var insStmt = db.prepare('INSERT INTO mv VALUES(?, ?, ?, ?, ?, ?)')
-      insStmt.run(
-        number,
-        now.unix(),
-        'CAD',
-        balances['CAD'].cash,
-        balances['CAD'].marketValue,
-        balances['CAD'].cost)
-      insStmt.run(
-        number,
-        now.unix(),
-        'USD',
-        balances['USD'].cash,
-        balances['USD'].marketValue,
-        balances['USD'].cost)
+      _.each(['CAD', 'USD'], function (cur) {
+        insStmt.run(
+          number,
+          now.unix(),
+          cur,
+          balances[cur].cash,
+          balances[cur].marketValue,
+          balances[cur].cost)
+      })
     })
   }
 
