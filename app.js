@@ -159,7 +159,7 @@ app.get('/api/store_account_mv', function (req, res) {
       now.hour(0)
 
       var delStmt = db.prepare('DELETE FROM mv WHERE number = ? AND date = ?')
-      delStmt.run(now.unix())
+      delStmt.run(number, now.unix())
 
       var insStmt = db.prepare('INSERT INTO mv VALUES(?, ?, ?, ?, ?, ?)')
       insStmt.run(
