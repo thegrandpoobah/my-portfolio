@@ -2,27 +2,9 @@ var Promise = require('bluebird')
 var express = require('express')
 var moment = require('moment')
 var _ = require('lodash')
+var log = require('npmlog')
 var questrade = require('./questrade')
 var db = require('./db').connect()
-
-var LogLevels = {
-  DEBUG: 0,
-  INFO: 1,
-  WARN: 2,
-  ERROR: 3,
-  CRITICAL: 4
-}
-
-var LogLevel = 'DEBUG'
-
-function log (level) {
-  if (LogLevels[level] >= LogLevels[LogLevel]) {
-    var args = _.toArray(arguments)
-    args.shift()
-
-    console.log.apply(this, args)
-  }
-}
 
 var app = express()
 
@@ -73,7 +55,7 @@ app.get('/api/store_account_mv', function (req, res) {
     publishToDb(number, cash)
   }
 
-  log('INFO', 'Performing sync of account data')
+  log.info('sync', 'Starting sync of account data')
 
   questrade.request('/v1/accounts', true).then(function (resp) {
     _.each(resp.accounts, function (account) {
@@ -90,8 +72,6 @@ app.get('/api/store_account_mv', function (req, res) {
 })
 
 app.get('/api/accounts/:id/historical_mv', function (req, res) {
-  log('INFO', 'Retrieving Historical Account MV')
-
   db.serialize(function () {
     var mv = {'CAD': [], 'USD': []}
 
@@ -123,7 +103,7 @@ app.get('/api/accounts/:id/historical_mv', function (req, res) {
 
 app.get('/api/*', function (req, res) {
   questrade.request('/v1' + req.originalUrl.substr(4), false).then(function (resp) {
-    log('DEBUG', resp)
+    log.verbose(resp)
     res.set({
       'Content-Type': 'application/json'
     }).send(resp)
@@ -136,5 +116,5 @@ var server = app.listen(3000, function () {
   var host = server.address().address
   var port = server.address().port
 
-  console.log('Questrade API Proxy listening at http://%s:%s', host, port)
+  log.info('web', 'Questrade API Proxy listening at http://%s:%s', host, port)
 })
