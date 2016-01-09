@@ -1,7 +1,8 @@
 var sqlite3 = require('sqlite3')
 var fs = require('fs')
+var config = require('config')
 
-var DatabaseFile = 'mv.db'
+var DatabaseFile = config.get('database_uri')
 
 function connect () {
   var exists = fs.existsSync(DatabaseFile)

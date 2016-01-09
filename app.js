@@ -2,6 +2,7 @@ var express = require('express')
 var moment = require('moment')
 var _ = require('lodash')
 var log = require('npmlog')
+var config = require('config')
 var questrade = require('./questrade')
 var db = require('./db').connect()
 
@@ -62,7 +63,7 @@ app.get('/api/*', function (req, res) {
 app.use(express.static('dist'))
 
 app.set('etag', false)
-var server = app.listen(3000, function () {
+var server = app.listen(config.get('server_port'), function () {
   var host = server.address().address
   var port = server.address().port
 

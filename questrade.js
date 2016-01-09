@@ -5,8 +5,9 @@ var moment = require('moment')
 var url = require('url')
 var log = require('npmlog')
 var _ = require('lodash')
+var config = require('config')
 
-var Authorization = JSON.parse(fs.readFileSync('authorization.json', 'utf8'))
+var Authorization = JSON.parse(fs.readFileSync(config.get('authorization'), 'utf8'))
 
 var authorizationPromise = null
 
@@ -53,7 +54,7 @@ function qtAuthorize () {
             a.api_server = serverUrl.host
             Authorization = a
 
-            fs.writeFile('authorization.json', JSON.stringify(a), function (err) {
+            fs.writeFile(config.get('authorization'), JSON.stringify(a), function (err) {
               if (err) {
                 reject({code: -1, message: err.toString(), statusCode: 500})
               } else {
