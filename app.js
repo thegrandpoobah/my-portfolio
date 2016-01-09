@@ -16,7 +16,7 @@ app.get('/api/accounts/:id/candles', function (req, res) {
 
   db.each('SELECT * FROM mv WHERE number = ? AND date >= ? AND date <= ?', req.params.id, startTime, endTime, function (err, row) {
     if (err) {
-      res.status(500).json(err)
+      res.status(500).json({code: -1, message: err.toString()})
       responded = true
       return
     }
@@ -31,7 +31,7 @@ app.get('/api/accounts/:id/candles', function (req, res) {
     }
 
     if (err) {
-      res.status(500).json(err)
+      res.status(500).json({code: -1, message: err.toString()})
       return
     }
 
@@ -55,6 +55,8 @@ app.get('/api/*', function (req, res) {
     res.set({
       'Content-Type': 'application/json'
     }).send(resp)
+  }).error(function (resp) {
+    res.status(resp.statusCode).json({code: resp.code, message: resp.message})
   })
 })
 app.use(express.static('dist'))

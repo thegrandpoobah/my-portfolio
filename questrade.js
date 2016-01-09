@@ -4,6 +4,7 @@ var Promise = require('bluebird')
 var moment = require('moment')
 var url = require('url')
 var log = require('npmlog')
+var _ = require('lodash')
 
 var Authorization = JSON.parse(fs.readFileSync('authorization.json', 'utf8'))
 
@@ -39,6 +40,11 @@ function qtAuthorize () {
           })
 
           res.on('end', function () {
+            if (res.statusCode !== 200) {
+              reject({code: -1, message: 'Internal Server Error', statusCode: 500})
+              return
+            }
+
             var a = JSON.parse(responseString)
 
             a.generation_time = moment().toISOString()
@@ -49,7 +55,7 @@ function qtAuthorize () {
 
             fs.writeFile('authorization.json', JSON.stringify(a), function (err) {
               if (err) {
-                reject(err)
+                reject({code: -1, message: err.toString(), statusCode: 500})
               } else {
                 resolve(a)
               }
@@ -57,7 +63,7 @@ function qtAuthorize () {
           })
 
           res.on('error', function (e) {
-            reject(e)
+            reject({code: -1, message: e.toString(), statusCode: 500})
           })
         })
 
@@ -71,7 +77,7 @@ function qtAuthorize () {
   var p = internal()
 
   authorizationPromise = p
-  p.then(function () {
+  p.finally(function () {
     authorizationPromise = null
   })
 
@@ -100,6 +106,11 @@ function qtRequest (auth, endpoint, asObject) {
       })
 
       res.on('end', function () {
+        if (res.statusCode !== 200) {
+          reject(_.assign(JSON.parse(responseString), {statusCode: res.statusCode}))
+          return
+        }
+
         if (asObject) {
           resolve(JSON.parse(responseString))
         } else {
@@ -108,7 +119,7 @@ function qtRequest (auth, endpoint, asObject) {
       })
 
       res.on('error', function (e) {
-        reject(e)
+        reject({code: -1, message: e.toString(), statusCode: 500})
       })
     })
 
