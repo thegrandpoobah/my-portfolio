@@ -138,7 +138,24 @@ function renderPositionTables(accountId) {
     var balances = r1[0]
     var positions = r2[0].positions
     
-    onPositionLoadComplete(positions, balances)
+    var symbols = _.map(positions, function(position) {
+      return position.symbol
+    })
+    
+    $.getJSON('/api/symbols/?names=' + symbols.join(',')).then(function(extendedInfo) {
+      var bySymbol = _.reduce(positions, function(result, position) {
+        result[position.symbol] = position
+        return result
+      }, {})
+      
+      _.each(extendedInfo.symbols, function(symbol) {
+        var existing = bySymbol[symbol.symbol] 
+        _.assign(existing, symbol)
+        existing.dailyChange = existing.currentPrice - existing.prevDayClosePrice
+      })
+      
+      onPositionLoadComplete(positions, balances)
+    })
   })
 }
 
@@ -216,6 +233,15 @@ $(function() {
         return 'currency-positive'
       } else {
         return 'currency-negative'
+      }
+    },
+    'priceDifference': function(amount) {
+      if (Math.abs(amount) < 0.001) {
+        return '--'
+      } else if (amount >= 0) {
+        return '<span class="currency-positive">(<span class="glyphicon glyphicon-arrow-up" aria-hidden="true"></span>&nbsp;' + amount.toFixed(2) + ')</span>'
+      } else {
+        return '<span class="currency-negative">(<span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span>&nbsp;' + amount.toFixed(2) + ')</span>'
       }
     },
     'percentage': function(amount) {
