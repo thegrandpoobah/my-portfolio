@@ -60,7 +60,7 @@ app.get('/api/*', function (req, res) {
     res.status(resp.statusCode).json({code: resp.code, message: resp.message})
   })
 })
-app.use(express.static('dist'))
+app.use(express.static(config.get("static_assets")))
 
 app.set('etag', false)
 var server = app.listen(config.get('server_port'), function () {
