@@ -62,5 +62,10 @@
         2
       ]
     }
+  },
+  "standard": {
+    "ignore": [
+      "client/Gruntfile.js"
+    ]
   }
 }
