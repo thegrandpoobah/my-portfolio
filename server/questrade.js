@@ -27,10 +27,7 @@ function qtAuthorize () {
         var opts = {
           host: 'login.questrade.com',
           path: '/oauth2/token?grant_type=refresh_token&refresh_token=' + auth.refresh_token,
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json'
-          }
+          method: 'GET'
         }
 
         var req = https.request(opts, function (res) {
