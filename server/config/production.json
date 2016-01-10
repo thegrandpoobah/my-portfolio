@@ -1,6 +1,6 @@
 {
   "server_port": 80,
-  "database_uri": "/var/db/mv.db",
-  "authorization": "/var/db/authorization.json",
+  "database_uri": "/vol/db/mv.db",
+  "authorization": "/vol/db/authorization.json",
   "static_assets": "../client/dist"
 }
