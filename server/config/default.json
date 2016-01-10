@@ -1,6 +1,6 @@
 {
   "server_port": 3000,
-  "database_uri": "mv.db",
-  "authorization": "authorization.json",
-  "static_assets": "../client/dist"
+  "database_uri": "./server/mv.db",
+  "authorization": "./server/authorization.json",
+  "static_assets": "./client/dist"
 }
