@@ -39,6 +39,7 @@ function qtAuthorize () {
 
           res.on('end', function () {
             if (res.statusCode !== 200) {
+              log.error(responseString)
               reject({code: -1, message: 'Internal Server Error', statusCode: 500})
               return
             }
