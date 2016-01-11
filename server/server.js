@@ -63,7 +63,7 @@ app.get('/api/*', function (req, res) {
     res.set({
       'Content-Type': 'application/json'
     }).send(resp)
-  }).error(function (resp) {
+  }).catch(function (resp) {
     res.status(resp.statusCode).json({code: resp.code, message: resp.message})
   })
 })
