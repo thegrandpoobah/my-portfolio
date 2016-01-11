@@ -8,6 +8,13 @@ var db = require('./db').connect()
 
 var app = express()
 
+app.use(function (req, res, next) {
+  if (req.headers['x-forwarded-proto'] && req.headers['x-forwarded-proto'].toLowerCase() === 'http') {
+     return res.redirect('https://' + req.headers.host + req.url)
+  }
+  next()
+})
+
 app.get('/api/accounts/:id/candles', function (req, res) {
   var startTime = moment(req.query.startTime).unix()
   var endTime = moment(req.query.endTime).unix()
