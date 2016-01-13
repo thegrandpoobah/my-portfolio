@@ -2,6 +2,7 @@ node_modules
 dist
 .tmp
 bower_components
-authorization.json
-mv.db
+authorization_server.json
+authorization_cron.json
+*.db
 sqlite3.exe
