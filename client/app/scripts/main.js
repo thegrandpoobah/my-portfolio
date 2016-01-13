@@ -239,7 +239,7 @@ $(function () {
     },
     'priceDifference': function (amount) {
       if (Math.abs(amount) < 0.001) {
-        return '(--)'
+        return '(&mdash;)'
       } else if (amount >= 0) {
         return '<span class="currency-positive">(<span class="glyphicon glyphicon-arrow-up" aria-hidden="true"></span>&nbsp;' + amount.toFixed(2) + ')</span>'
       } else {
