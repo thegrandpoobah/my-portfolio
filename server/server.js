@@ -3,7 +3,7 @@ var moment = require('moment')
 var _ = require('lodash')
 var log = require('npmlog')
 var config = require('config')
-var questrade = require('./questrade')
+var questrade = require('./questrade').init(config.get('authorization_server'))
 var db = require('./db').connect()
 
 var app = express()

@@ -5,18 +5,15 @@ var moment = require('moment')
 var url = require('url')
 var log = require('npmlog')
 var _ = require('lodash')
-var config = require('config')
-
-var Authorization = JSON.parse(fs.readFileSync(config.get('authorization'), 'utf8'))
 
 var authorizationPromise = null
 
-function qtAuthorize () {
+function qtAuthorize (_auth) {
   if (authorizationPromise != null) {
     return authorizationPromise
   }
 
-  var auth = Authorization
+  var auth = _auth
 
   function internal () {
     return new Promise(function (resolve, reject) {
@@ -50,15 +47,7 @@ function qtAuthorize () {
 
             var serverUrl = url.parse(a.api_server)
             a.api_server = serverUrl.host
-            Authorization = a
-
-            fs.writeFile(config.get('authorization'), JSON.stringify(a), function (err) {
-              if (err) {
-                reject({code: -1, message: err.toString(), statusCode: 500})
-              } else {
-                resolve(a)
-              }
-            })
+            resolve(a)
           })
 
           res.on('error', function (e) {
@@ -127,9 +116,31 @@ function qtRequest (auth, endpoint, asObject) {
 }
 
 module.exports = {
-  request: function (endpoint, asObject) {
-    return qtAuthorize().then(function (auth) {
-      return qtRequest(auth, endpoint, asObject)
-    })
+  init: function (authorizationFile) {
+    if (_.isUndefined(authorizationFile)) {
+      log.error('Must provide authorizationFile parameter')
+      return
+    }
+
+    var authorization = JSON.parse(fs.readFileSync(authorizationFile, 'utf8'))
+
+    return {
+      request: function (endpoint, asObject) {
+        return qtAuthorize(authorization).then(function (auth) {
+          if (auth.refresh_token !== authorization.refresh_token) {
+            authorization = auth
+
+            fs.writeFile(authorizationFile, JSON.stringify(auth), function (err) {
+              if (err) {
+                log.error(err)
+              }
+            })
+          }
+
+          return qtRequest(auth, endpoint, asObject)
+        })
+      }
+    }
   }
 }
+

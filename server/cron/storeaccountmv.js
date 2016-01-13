@@ -2,7 +2,8 @@ var Promise = require('bluebird')
 var log = require('npmlog')
 var moment = require('moment')
 var _ = require('lodash')
-var questrade = require('../questrade')
+var config = require('config')
+var questrade = require('../questrade').init(config.get('authorization_cron'))
 var db = require('../db').connect()
 
 function publishToDb (number, balances) {
