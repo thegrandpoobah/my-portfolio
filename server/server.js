@@ -10,7 +10,7 @@ var app = express()
 
 app.use(function (req, res, next) {
   if (req.headers['x-forwarded-proto'] && req.headers['x-forwarded-proto'].toLowerCase() === 'http') {
-     return res.redirect('https://' + req.headers.host + req.url)
+    return res.redirect('https://' + req.headers.host + req.url)
   }
   next()
 })
