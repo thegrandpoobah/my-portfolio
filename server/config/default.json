@@ -1,7 +1,7 @@
 {
   "server_port": 3000,
   "database_uri": "./mv.db",
-  "authorization_server": "./authorization_server.json",
-  "authorization_cron": "./authorization_cron.json",
+  "authorization_server": "./authorization.json",
+  "authorization_cron": "./authorization.json",
   "static_assets": "../client/dist"
 }
