@@ -161,12 +161,16 @@ function renderPositionTables (accountId) {
   })
 }
 
-function renderPositionDetails ($position) {
-  var symbolId = $position.closest('a').data('symbolid')
+function renderPositionDetails ($positionRow) {
+  var symbolId = $positionRow.find('a').data('symbolid')
 
   if ($('#symbol' + symbolId).length > 0) {
-    $position.find('.glyphicon').removeClass('glyphicon-menu-down').addClass('glyphicon-menu-right')
+    $position.find('a .glyphicon')
+      .removeClass('glyphicon-menu-down')
+      .addClass('glyphicon-menu-right')
+
     $('#symbol' + symbolId).remove()
+
     return
   }
 
@@ -206,13 +210,11 @@ function renderPositionDetails ($position) {
     })
   })
 
-  $position
-    .closest('a').find('.glyphicon')
-      .removeClass('glyphicon-menu-right')
-      .addClass('glyphicon-menu-down')
-      .end()
-    .closest('tr')
-      .after(templates['position-details-container-template']({symbolId: symbolId}))
+  $position.find('a .glyphicon')
+    .removeClass('glyphicon-menu-right')
+    .addClass('glyphicon-menu-down')
+    .end()
+    .after(templates['position-details-container-template']({symbolId: symbolId}))
 }
 
 $(function () {
@@ -261,8 +263,15 @@ $(function () {
     renderPositionTables(accountId)
   })
 
+  $('.position-container').on('click', 'tr.position-row', function (e) {
+    if (Modernizr.mq('max-width(992px')) {
+      renderPositionDetails($(e.target).closest('tr'))
+    }
+  })
   $('.position-container').on('click', 'a', function (e) {
-    renderPositionDetails($(e.target))
+    if (Modernizr.mq('min-width(993px')) {
+      renderPositionDetails($(e.target).closest('tr'))
+    }
 
     e.preventDefault()
   })
