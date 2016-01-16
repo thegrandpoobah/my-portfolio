@@ -1,4 +1,5 @@
 var express = require('express')
+var compression = require('compression')
 var moment = require('moment')
 var _ = require('lodash')
 var log = require('npmlog')
@@ -14,6 +15,8 @@ app.use(function (req, res, next) {
   }
   next()
 })
+
+app.use(compression())
 
 app.get('/api/accounts/:id/candles', function (req, res) {
   var startTime = moment(req.query.startTime).unix()
