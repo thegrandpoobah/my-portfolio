@@ -178,7 +178,9 @@ function renderPositionDetails ($positionRow) {
 
   symbolInfo.then(function (resp) {
     var stockInfo = resp.symbols[0]
+
     stockInfo.curr = stockInfo.currency
+    stockInfo.hasIndustry = stockInfo.industrySector || stockInfo.industryGroup || stockInfo.industrySubgroup
 
     $('#symbol' + symbolId + ' .sidebar-container').html(templates['position-details-template'](stockInfo))
 
