@@ -93,6 +93,11 @@ $icon-font-path: "../bower_components/bootstrap-sass/assets/fonts/bootstrap/";
     margin: 10px 0;
   }
 }
+@media (min-width: 0px) and (max-width: 992px) {
+  .position-details .chart-container .mg-chart-title {
+    display: none;
+  }
+}
 /* Main marketing message and sign up button */
 .jumbotron {
   text-align: center;

@@ -1,4 +1,4 @@
-/* global $ _ moment Handlebars MG */
+/* global $ _ moment Handlebars MG Modernizr */
 
 var templates = {}
 
@@ -165,7 +165,7 @@ function renderPositionDetails ($positionRow) {
   var symbolId = $positionRow.find('a').data('symbolid')
 
   if ($('#symbol' + symbolId).length > 0) {
-    $position.find('a .glyphicon')
+    $positionRow.find('a .glyphicon')
       .removeClass('glyphicon-menu-down')
       .addClass('glyphicon-menu-right')
 
@@ -197,6 +197,8 @@ function renderPositionDetails ($positionRow) {
     var stockPrices = createIndexedData(r2[0].candles)
 
     findBenchmarkPrices(benchmarkMap[stockInfo.listingExchange], startTime, endTime).then(function (resp) {
+      $('#symbol' + symbolId + ' .mobile-chart-title').text(stockInfo.symbol + ' vs. ' + benchmarkMap[stockInfo.listingExchange])
+
       renderGraph('#symbol' + symbolId + ' .chart-container', '#symbol' + symbolId + ' .legend-container', [
         {
           name: stockInfo.symbol,
@@ -210,7 +212,7 @@ function renderPositionDetails ($positionRow) {
     })
   })
 
-  $position.find('a .glyphicon')
+  $positionRow.find('a .glyphicon')
     .removeClass('glyphicon-menu-right')
     .addClass('glyphicon-menu-down')
     .end()
@@ -264,12 +266,12 @@ $(function () {
   })
 
   $('.position-container').on('click', 'tr.position-row', function (e) {
-    if (Modernizr.mq('max-width(992px')) {
+    if (Modernizr.mq('(max-width: 992px)')) {
       renderPositionDetails($(e.target).closest('tr'))
     }
   })
-  $('.position-container').on('click', 'a', function (e) {
-    if (Modernizr.mq('min-width(993px')) {
+  $('.position-container').on('click', 'tr.position-row a', function (e) {
+    if (Modernizr.mq('(min-width: 993px)')) {
       renderPositionDetails($(e.target).closest('tr'))
     }
 
