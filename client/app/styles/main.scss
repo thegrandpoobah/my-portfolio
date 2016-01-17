@@ -76,6 +76,15 @@ $icon-font-path: "../bower_components/bootstrap-sass/assets/fonts/bootstrap/";
   color: rgb(201, 48, 44);
 }
 
+.position-details {
+  > td {
+    padding: 0;
+  }
+  .container,.container-fluid {
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
 .sidebar {
   position: fixed;
   right: 0;
