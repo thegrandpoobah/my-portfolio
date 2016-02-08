@@ -65,6 +65,10 @@ $icon-font-path: "../bower_components/bootstrap-sass/assets/fonts/bootstrap/";
 }
 .positions-table {
   margin-bottom: 0;
+  
+  .positions-row td {
+    white-space: nowrap;
+  }
 }
 .currency-positive {
   color: rgb(68, 157, 68);
