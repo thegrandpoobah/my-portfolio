@@ -1,6 +1,6 @@
 var Promise = require('bluebird')
 var log = require('npmlog')
-var moment = require('moment')
+var moment = require('moment-timezone')
 var _ = require('lodash')
 var config = require('config')
 var questrade = require('../questrade').init(config.get('authorization_cron'))
@@ -9,14 +9,15 @@ var db = require('../db').connect()
 function publishToDb (number, balances) {
   return new Promise(function (resolve, reject) {
     db.serialize(function () {
-      var now = moment()
+      var now = moment.tz('America/Toronto')
       now.millisecond(0)
       now.second(0)
       now.minute(0)
       now.hour(0)
+      now.add(1, 'day')
 
       var delStmt = db.prepare('DELETE FROM mv WHERE number = ? AND date = ?')
-      delStmt.run(number, now.unix(), function (err) {
+      delStmt.run(number, now.add(1, 'day').unix(), function (err) {
         if (err) {
           reject(err)
         }

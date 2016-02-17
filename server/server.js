@@ -1,6 +1,6 @@
 var express = require('express')
 var compression = require('compression')
-var moment = require('moment')
+var moment = require('moment-timezone')
 var _ = require('lodash')
 var log = require('npmlog')
 var config = require('config')
@@ -19,8 +19,8 @@ app.use(function (req, res, next) {
 app.use(compression())
 
 app.get('/api/accounts/:id/candles', function (req, res) {
-  var startTime = moment(req.query.startTime).unix()
-  var endTime = moment(req.query.endTime).unix()
+  var startTime = moment.parseZone(req.query.startTime).unix()
+  var endTime = moment.parseZone(req.query.endTime).unix()
 
   var responded = false
   var mv = {}
@@ -49,7 +49,7 @@ app.get('/api/accounts/:id/candles', function (req, res) {
     _.forEach(mv, function (val, key) {
       mv[key] = _.map(val, function (row) {
         return {
-          end: moment.unix(row.date).format(),
+          end: moment.unix(row.date).tz('America/Toronto').format(),
           open: Number.parseFloat(row.marketValue) / Number.parseFloat(row.cost),
           close: Number.parseFloat(row.marketValue) / Number.parseFloat(row.cost)
         }
