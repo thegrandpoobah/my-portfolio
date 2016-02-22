@@ -8,6 +8,21 @@ var benchmarkMap = {
   'NASDAQ': 'COMP.IN'
 }
 
+function getDateBoundaries () {
+  var endTime = moment()
+  endTime.millisecond(0)
+  endTime.second(0)
+  endTime.minute(0)
+  endTime.hour(0)
+  endTime.add(1, 'day')
+  var startTime = moment(endTime).subtract(1, 'y')
+
+  return {
+    startTime: startTime,
+    endTime: endTime
+  }
+}
+
 function createIndexedData (series) {
   _.each(series, function (datum) {
     datum.end = moment(datum.end).toDate()
@@ -23,9 +38,12 @@ function createIndexedData (series) {
   return series
 }
 
-function findBenchmarkPrices (symbol, startTime, endTime) {
+function findBenchmarkPrices (symbol, timeBoundary) {
   return $.getJSON('/api/symbols/search?prefix=' + symbol).then(function (resp) {
-    return $.getJSON('/api/markets/candles/' + resp.symbols[0].symbolId + '?startTime=' + startTime.format() + '&endTime=' + endTime.format() + '&interval=OneDay')
+    return $.getJSON('/api/markets/candles/' + resp.symbols[0].symbolId + '?startTime=' + timeBoundary.startTime.format() + '&endTime=' + timeBoundary.endTime.format() + '&interval=OneDay').then(function (resp) {
+      resp.candles.pop()
+      return resp
+    })
   })
 }
 
@@ -67,14 +85,13 @@ function renderOverviews (accountId) {
   renderLoadingGraph('#cadOverview .chart-container')
   renderLoadingGraph('#usdOverview .chart-container')
 
-  var endTime = moment()
-  var startTime = moment(endTime).subtract(1, 'y')
+  var boundaries = getDateBoundaries()
 
-  $.getJSON('/api/accounts/' + accountId + '/candles?startTime=' + startTime.format() + '&endTime=' + endTime.format() + '&currency=CAD&interval=OneDay').then(function (resp) {
+  $.getJSON('/api/accounts/' + accountId + '/candles?startTime=' + boundaries.startTime.format() + '&endTime=' + boundaries.endTime.format() + '&currency=CAD&interval=OneDay').then(function (resp) {
     _.each(['CAD', 'USD'], function (cur) {
       var portfolioPrices = createIndexedData(resp[cur])
 
-      findBenchmarkPrices(bmkMap[cur], startTime, endTime).then(function (resp) {
+      findBenchmarkPrices(bmkMap[cur], boundaries).then(function (resp) {
         renderGraph('#' + cur.toLowerCase() + 'Overview .chart-container', '#' + cur.toLowerCase() + 'Overview .legend-container', [
           {
             name: 'Portfolio',
@@ -187,10 +204,9 @@ function renderPositionDetails ($positionRow) {
     renderLoadingGraph('#symbol' + symbolId + ' .chart-container')
   })
 
-  var endTime = moment()
-  var startTime = moment(endTime).subtract(1, 'y')
+  var boundaries = getDateBoundaries()
 
-  var symbolCandle = $.getJSON('/api/markets/candles/' + symbolId + '?startTime=' + startTime.format() + '&endTime=' + endTime.format() + '&interval=OneDay')
+  var symbolCandle = $.getJSON('/api/markets/candles/' + symbolId + '?startTime=' + boundaries.startTime.format() + '&endTime=' + boundaries.endTime.format() + '&interval=OneDay')
 
   $.when(symbolInfo, symbolCandle).then(function (r1, r2) {
     var stockInfo = r1[0].symbols[0]
@@ -198,7 +214,7 @@ function renderPositionDetails ($positionRow) {
 
     var stockPrices = createIndexedData(r2[0].candles)
 
-    findBenchmarkPrices(benchmarkMap[stockInfo.listingExchange], startTime, endTime).then(function (resp) {
+    findBenchmarkPrices(benchmarkMap[stockInfo.listingExchange], boundaries).then(function (resp) {
       $('#symbol' + symbolId + ' .mobile-chart-title').text(stockInfo.symbol + ' vs. ' + benchmarkMap[stockInfo.listingExchange])
 
       renderGraph('#symbol' + symbolId + ' .chart-container', '#symbol' + symbolId + ' .legend-container', [
