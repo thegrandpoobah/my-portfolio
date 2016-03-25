@@ -244,14 +244,18 @@ $(function () {
 
   Handlebars.registerHelper({
     'currency': function (amount) {
-      if (amount >= 0) {
+      if (amount == null) {
+        return '--'
+      } else if (amount >= 0) {
         return amount.toFixed(2)
       } else {
         return '(' + Math.abs(amount).toFixed(2) + ')'
       }
     },
     'currencyClass': function (amount) {
-      if (Math.abs(amount) < 0.001) {
+      if (amount == null) {
+        return ''
+      } else if (Math.abs(amount) < 0.001) {
         return 'currency-zero'
       } else if (amount >= 0) {
         return 'currency-positive'
@@ -260,7 +264,7 @@ $(function () {
       }
     },
     'priceDifference': function (amount) {
-      if (Math.abs(amount) < 0.001) {
+      if (amount == null || Math.abs(amount) < 0.001) {
         return '(&mdash;)'
       } else if (amount >= 0) {
         return '<span class="currency-positive">(<span class="glyphicon glyphicon-arrow-up" aria-hidden="true"></span>&nbsp;' + amount.toFixed(2) + ')</span>'
@@ -269,7 +273,7 @@ $(function () {
       }
     },
     'percentage': function (amount) {
-      return (amount * 100).toFixed(2)
+      return ((amount || 0 ) * 100).toFixed(2)
     },
     'date': function (date) {
       return moment(date, moment.ISO_8601).format('L')
