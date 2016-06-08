@@ -7,7 +7,7 @@
     "handlebars": "~4.0.5",
     "bootstrap-sass": "~3.3.6",
     "moment": "~2.10.6",
-    "metrics-graphics": "~2.7.0"
+    "metrics-graphics": "~2.9.0"
   },
   "overrides": {
     "bootstrap-sass": {
