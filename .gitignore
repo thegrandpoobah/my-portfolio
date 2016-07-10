@@ -4,4 +4,6 @@ dist
 bower_components
 authorization*.json
 *.db
-sqlite3.exe
+latest.zip
+aws secret.txt
+server/config/production.json
