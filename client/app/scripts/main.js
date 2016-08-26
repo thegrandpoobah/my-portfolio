@@ -60,7 +60,7 @@ function renderLoadingGraph (target) {
 function renderGraph (chartTarget, legendTarget, dataSeries) {
   MG.data_graphic({
     title: dataSeries[0].name + ' vs ' + dataSeries[1].name,
-    data: _.pluck(dataSeries, 'prices'),
+    data: _.map(dataSeries, 'prices'),
     colors: ['blue', 'red'],
     full_width: true,
     height: 400,
@@ -68,7 +68,7 @@ function renderGraph (chartTarget, legendTarget, dataSeries) {
     x_accessor: 'end',
     y_accessor: 'index',
     min_y_from_data: true,
-    legend: _.pluck(dataSeries, 'name'),
+    legend: _.map(dataSeries, 'name'),
     legend_target: legendTarget,
     aggregate_rollover: true,
     format: 'percentage',
