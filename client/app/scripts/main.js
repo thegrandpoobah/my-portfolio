@@ -58,6 +58,16 @@ function renderLoadingGraph (target) {
 }
 
 function renderGraph (chartTarget, legendTarget, dataSeries) {
+  var markers = []
+  var iter = getDateBoundaries().startTime
+  for (var i = 0; i < 3; i++) {
+    iter = iter.add(1, 'Q')
+    markers.push({
+      'index': iter,
+      'label': iter.format('Q[Q]YYYY')
+    })
+  }
+
   MG.data_graphic({
     title: dataSeries[0].name + ' vs ' + dataSeries[1].name,
     data: _.map(dataSeries, 'prices'),
@@ -72,7 +82,10 @@ function renderGraph (chartTarget, legendTarget, dataSeries) {
     legend_target: legendTarget,
     aggregate_rollover: true,
     format: 'percentage',
-    baselines: [{value: 1, label: '100%'}]
+    inflator: 1,
+    y_rug: true,
+    baselines: [{value: 1, label: '100%'}],
+    markers: markers
   })
 }
 
