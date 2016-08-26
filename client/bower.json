@@ -2,12 +2,12 @@
   "name": "questrade",
   "private": true,
   "dependencies": {
-    "lodash": "~3.10.1",
-    "jquery": "~2.1.4",
-    "handlebars": "~4.0.5",
-    "bootstrap-sass": "~3.3.6",
-    "moment": "~2.10.6",
-    "metrics-graphics": "~2.9.0"
+    "lodash": "4.15.0",
+    "jquery": "3.1.0",
+    "handlebars": "4.0.5",
+    "bootstrap-sass": "3.3.7",
+    "moment": "2.14.1",
+    "metrics-graphics": "2.10.1"
   },
   "overrides": {
     "bootstrap-sass": {
