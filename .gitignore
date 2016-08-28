@@ -4,6 +4,6 @@ dist
 bower_components
 authorization*.json
 *.db
-latest.zip
+server.zip
 aws secret.txt
 server/config/production.json
