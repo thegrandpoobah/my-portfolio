@@ -6,7 +6,7 @@ var Handlebars = require('handlebars/runtime')
 var MG = require('metrics-graphics')
 var moment = require('moment')
 
-require('!style!css!../../node_modules/metrics-graphics/dist/metricsgraphics.css')
+require('../../node_modules/metrics-graphics/dist/metricsgraphics.css')
 
 var templates = {
   'position-table-template': require('./position-table.handlebars'),

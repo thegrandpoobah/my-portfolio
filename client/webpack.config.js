@@ -7,7 +7,8 @@ module.exports = {
     module: {
         loaders: [
             { test: /\.handlebars$/, loader: "handlebars-loader" },
-            { test: /\.modernizrrc$/, loader: "modernizr" }
+            { test: /\.modernizrrc$/, loader: "modernizr" },
+            { test: /\.css$/, loader: "style!css" },
         ]
     },
     resolve: {
