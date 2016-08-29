@@ -3,5 +3,5 @@
   "database_uri": "./mv.db",
   "authorization_server": "./authorization.json",
   "authorization_cron": "./authorization.json",
-  "static_assets": "../client/dist"
+  "static_assets": "../client/app"
 }
