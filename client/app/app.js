@@ -6,6 +6,7 @@ var Handlebars = require('handlebars/runtime')
 var MG = require('metrics-graphics')
 var moment = require('moment')
 
+require('./styles/main.scss')
 require('../../node_modules/metrics-graphics/dist/metricsgraphics.css')
 
 var templates = {
