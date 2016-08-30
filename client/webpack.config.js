@@ -26,7 +26,7 @@ module.exports = {
     },
     resolve: {
       alias: {
-        modernizr$: __dirname + "/.modernizrrc"
+        modernizr$: path.join(__dirname, ".modernizrrc")
       }
     },
     devtool: 'source-map',
