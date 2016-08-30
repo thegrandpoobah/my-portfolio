@@ -72,8 +72,8 @@ function renderLoadingGraph (target) {
 
 function renderGraph (chartTarget, legendTarget, dataSeries) {
   var markers = []
-  var iter = getDateBoundaries().startTime
-  for (var i = 0; i < 3; i++) {
+  var iter = getDateBoundaries().startTime.startOf('quarter')
+  for (var i = 0; i < 4; i++) {
     iter = iter.add(1, 'Q')
     markers.push({
       'end': iter.toDate(),
