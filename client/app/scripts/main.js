@@ -76,7 +76,7 @@ function renderGraph (chartTarget, legendTarget, dataSeries) {
   for (var i = 0; i < 3; i++) {
     iter = iter.add(1, 'Q')
     markers.push({
-      'index': iter,
+      'end': iter.toDate(),
       'label': iter.format('Q[Q]YYYY')
     })
   }

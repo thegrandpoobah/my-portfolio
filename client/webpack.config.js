@@ -9,7 +9,7 @@ module.exports = {
         bootstrap: ['bootstrap-loader/extractStyles']
     },
     output: {
-        path: __dirname + '/dist',
+        path: path.join(__dirname, 'dist'),
         publicPath: '/',
         filename: "scripts/app.js"
     },
