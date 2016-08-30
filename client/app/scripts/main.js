@@ -267,7 +267,9 @@ $(function () {
   Handlebars.registerHelper({
     'currency': function (amount) {
       if (amount == null) {
-        return '--'
+        return '&mdash;'
+      } else if (Math.abs(amount) < 0.001) {
+        return '0.00'
       } else if (amount >= 0) {
         return amount.toFixed(2)
       } else {
