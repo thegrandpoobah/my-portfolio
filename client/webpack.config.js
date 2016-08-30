@@ -20,7 +20,7 @@ module.exports = {
             { test: /\.modernizrrc$/, loader: "modernizr" },
             { test: /\.css$/, loader: ExtractTextPlugin.extract("style", ["css"]) },
             { test: /\.scss$/, loader: ExtractTextPlugin.extract("style", ["css", "sass"]) },
-            { test: /\.woff($|\?)|\.woff2($|\?)|\.ttf($|\?)|\.eot($|\?)|\.svg($|\?)/, loader: 'url-loader?limit=8196&name=fonts/[hash].[ext]' }
+            { test: /\.woff($|\?)|\.woff2($|\?)|\.ttf($|\?)|\.eot($|\?)|\.svg($|\?)/, loader: "url-loader?limit=8196&name=fonts/[hash].[ext]" }
         ]
     },
     resolve: {
@@ -30,9 +30,14 @@ module.exports = {
     },
     plugins: [
         new webpack.optimize.CommonsChunkPlugin({ names: ["bootstrap", "vendor"], filename: "scripts/[name].[chunkhash].js" }),
-        new ExtractTextPlugin('styles/[name].[chunkhash].css'),
+        new ExtractTextPlugin("styles/[name].[chunkhash].css"),
         new HtmlWebpackPlugin({
-            template: 'app/index.html.handlebars'
+            template: "app/index.html.handlebars"
+        }),
+        new HtmlWebpackPlugin({
+            filename: "health.html",
+            template: "app/health.html",
+            inject: false
         })
     ]
 };
