@@ -29,7 +29,14 @@ module.exports = {
         modernizr$: __dirname + "/.modernizrrc"
       }
     },
+    devtool: 'source-map',
     plugins: [
+        new webpack.optimize.UglifyJsPlugin({
+            compress: {
+                warnings: false
+            }
+        }),
+        new webpack.optimize.DedupePlugin(),
         new webpack.optimize.CommonsChunkPlugin({ names: ["bootstrap", "vendor"], filename: "scripts/[name].[chunkhash].js" }),
         new ExtractTextPlugin("styles/[name].[chunkhash].css"),
         new FaviconsWebpackPlugin("./app/favicon.png"),
@@ -39,6 +46,11 @@ module.exports = {
         new HtmlWebpackPlugin({
             filename: "health.html",
             template: "app/health.html",
+            inject: false
+        }),
+        new HtmlWebpackPlugin({
+            filename: "robots.txt",
+            template: "app/robots.txt",
             inject: false
         })
     ]
