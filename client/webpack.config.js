@@ -1,6 +1,7 @@
 var webpack = require("webpack")
 var path = require("path")
 var ExtractTextPlugin = require("extract-text-webpack-plugin")
+var HtmlWebpackPlugin = require('html-webpack-plugin')
 
 module.exports = {
     entry: {
@@ -11,7 +12,7 @@ module.exports = {
     output: {
         path: path.join(__dirname, 'dist'),
         publicPath: '/',
-        filename: "scripts/app.js"
+        filename: "scripts/app.[chunkhash].js"
     },
     module: {
         loaders: [
@@ -28,7 +29,10 @@ module.exports = {
       }
     },
     plugins: [
-        new webpack.optimize.CommonsChunkPlugin({ names: ["bootstrap", "vendor"], filename: "scripts/[name].js" }),
-        new ExtractTextPlugin('styles/[name].css')
+        new webpack.optimize.CommonsChunkPlugin({ names: ["bootstrap", "vendor"], filename: "scripts/[name].[chunkhash].js" }),
+        new ExtractTextPlugin('styles/[name].[chunkhash].css'),
+        new HtmlWebpackPlugin({
+            template: 'app/index.html.handlebars'
+        })
     ]
 };
