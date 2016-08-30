@@ -1,11 +1,19 @@
+require('modernizr')
+
+var $ = require('jquery')
 var _ = require('lodash')
-//var Handlebars = require('handlebars')
-var Modernizr = require('modernizr')
+var Handlebars = require('handlebars/runtime')
 var MG = require('metrics-graphics')
 var moment = require('moment')
-require('!style!css!metrics-graphics/dist/metricsgraphics.css')
 
-var templates = {}
+require('../styles/main.scss')
+require('../../../node_modules/metrics-graphics/dist/metricsgraphics.css')
+
+var templates = {
+  'position-table-template': require('../templates/position-table.handlebars'),
+  'position-details-template': require('../templates/position-details.handlebars'),
+  'position-details-container-template': require('../templates/position-details-container.handlebars')
+}
 
 var benchmarkMap = {
   'TSX': 'TSX.IN',
@@ -163,7 +171,7 @@ function renderPositionTables (accountId) {
     })
 
     _.each(['CAD', 'USD'], function (cur) {
-      byCurrency[cur] = _.sortByOrder(byCurrency[cur], ['portfolioWeight'], ['desc'])
+      byCurrency[cur] = _.orderBy(byCurrency[cur], ['portfolioWeight'], ['desc'])
       $('#' + cur.toLowerCase() + 'Positions').html(templates['position-table-template']({positions: byCurrency[cur], balance: cash[cur]}))
     })
   }
@@ -256,10 +264,6 @@ function renderPositionDetails ($positionRow) {
 }
 
 $(function () {
-  $('script[type="text/x-handlerbars-template"]').each(function (i, elem) {
-    templates[elem.id] = Handlebars.compile($(elem).html())
-  })
-
   Handlebars.registerHelper({
     'currency': function (amount) {
       if (amount == null) {
