@@ -1,7 +1,8 @@
 var webpack = require("webpack")
 var path = require("path")
 var ExtractTextPlugin = require("extract-text-webpack-plugin")
-var HtmlWebpackPlugin = require('html-webpack-plugin')
+var HtmlWebpackPlugin = require("html-webpack-plugin")
+var FaviconsWebpackPlugin = require("favicons-webpack-plugin")
 
 module.exports = {
     entry: {
@@ -31,6 +32,7 @@ module.exports = {
     plugins: [
         new webpack.optimize.CommonsChunkPlugin({ names: ["bootstrap", "vendor"], filename: "scripts/[name].[chunkhash].js" }),
         new ExtractTextPlugin("styles/[name].[chunkhash].css"),
+        new FaviconsWebpackPlugin("./app/favicon.png"),
         new HtmlWebpackPlugin({
             template: "app/index.html.handlebars"
         }),
