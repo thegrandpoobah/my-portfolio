@@ -14,8 +14,8 @@ module.exports = {
         loaders: [
             { test: /\.handlebars$/, loader: "handlebars-loader" },
             { test: /\.modernizrrc$/, loader: "modernizr" },
-            { test: /\.css$/, loader: ExtractTextPlugin.extract("style", "css") },
-            { test: /\.scss$/, loader: ExtractTextPlugin.extract("style", "css", "sass") },
+            { test: /\.css$/, loader: ExtractTextPlugin.extract("style", ["css"]) },
+            { test: /\.scss$/, loader: ExtractTextPlugin.extract("style", ["css", "sass"]) },
         ]
     },
     resolve: {
