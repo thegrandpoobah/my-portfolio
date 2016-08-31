@@ -8,7 +8,9 @@ module.exports = {
     entry: {
         app: "./app/scripts/main.js",
         vendor: ["jquery", "lodash", "handlebars/runtime", "metrics-graphics", "moment", "modernizr"],
-        bootstrap: ['bootstrap-loader/extractStyles']
+        bootstrap: ["bootstrap-loader/lib/bootstrap.loader?configFilePath="+__dirname+"/.bootstraprc!bootstrap-loader/no-op.js"],
+        health: ["file?name=health.html!./app/health.html"],
+        robots: ["file?name=robots.txt!./app/robots.txt"]
     },
     output: {
         path: path.join(__dirname, 'dist'),
@@ -21,7 +23,8 @@ module.exports = {
             { test: /\.modernizrrc$/, loader: "modernizr" },
             { test: /\.css$/, loader: ExtractTextPlugin.extract("style", ["css"]) },
             { test: /\.scss$/, loader: ExtractTextPlugin.extract("style", ["css", "sass"]) },
-            { test: /\.woff($|\?)|\.woff2($|\?)|\.ttf($|\?)|\.eot($|\?)|\.svg($|\?)/, loader: "url-loader?limit=8196&name=fonts/[hash].[ext]" }
+            { test: /\.woff($|\?)|\.woff2($|\?)|\.ttf($|\?)|\.eot($|\?)|\.svg($|\?)/, loader: "url-loader?limit=8196&name=fonts/[hash].[ext]" },
+            { test: /bootstrap-sass[\/\\]assets[\/\\]javascripts[\/\\]/, loader: 'imports?jQuery=jquery' },
         ]
     },
     resolve: {
@@ -43,15 +46,6 @@ module.exports = {
         new HtmlWebpackPlugin({
             template: "app/index.html.handlebars"
         }),
-        new HtmlWebpackPlugin({
-            filename: "health.html",
-            template: "app/health.html",
-            inject: false
-        }),
-        new HtmlWebpackPlugin({
-            filename: "robots.txt",
-            template: "app/robots.txt",
-            inject: false
-        })
+        new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/) 
     ]
 };

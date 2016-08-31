@@ -39,6 +39,7 @@
     "file-loader": "^0.9.0",
     "handlebars-loader": "^1.3.0",
     "html-webpack-plugin": "^2.22.0",
+    "imports-loader": "^0.6.5",
     "modernizr-loader": "0.0.5",
     "node-sass": "^3.8.0",
     "resolve-url-loader": "^1.6.0",
