@@ -1,6 +1,6 @@
 #/bin/bash
-(cd ./client && grunt --force build)
-cp ./server/authorization.json ./dist/authorization.json
+rm -rf dist
+(cd ./client && webpack)
 cp ./server/db.js ./dist/db.js
 cp ./package.json ./dist/package.json
 cp ./server/questrade.js ./dist/questrade.js

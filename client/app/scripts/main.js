@@ -1,6 +1,19 @@
-/* global $ _ moment Handlebars MG Modernizr */
+require('modernizr')
 
-var templates = {}
+var $ = require('jquery')
+var _ = require('lodash')
+var Handlebars = require('handlebars/runtime')
+var MG = require('metrics-graphics')
+var moment = require('moment')
+
+require('../styles/main.scss')
+require('../../../node_modules/metrics-graphics/dist/metricsgraphics.css')
+
+var templates = {
+  'position-table-template': require('../templates/position-table.handlebars'),
+  'position-details-template': require('../templates/position-details.handlebars'),
+  'position-details-container-template': require('../templates/position-details-container.handlebars')
+}
 
 var benchmarkMap = {
   'TSX': 'TSX.IN',
@@ -58,9 +71,19 @@ function renderLoadingGraph (target) {
 }
 
 function renderGraph (chartTarget, legendTarget, dataSeries) {
+  var markers = []
+  var iter = getDateBoundaries().startTime.startOf('quarter')
+  for (var i = 0; i < 4; i++) {
+    iter = iter.add(1, 'Q')
+    markers.push({
+      'end': iter.toDate(),
+      'label': iter.format('Q[Q]YYYY')
+    })
+  }
+
   MG.data_graphic({
     title: dataSeries[0].name + ' vs ' + dataSeries[1].name,
-    data: _.pluck(dataSeries, 'prices'),
+    data: _.map(dataSeries, 'prices'),
     colors: ['blue', 'red'],
     full_width: true,
     height: 400,
@@ -68,11 +91,14 @@ function renderGraph (chartTarget, legendTarget, dataSeries) {
     x_accessor: 'end',
     y_accessor: 'index',
     min_y_from_data: true,
-    legend: _.pluck(dataSeries, 'name'),
+    legend: _.map(dataSeries, 'name'),
     legend_target: legendTarget,
     aggregate_rollover: true,
     format: 'percentage',
-    baselines: [{value: 1, label: '100%'}]
+    inflator: 1,
+    y_rug: true,
+    baselines: [{value: 1, label: '100%'}],
+    markers: markers
   })
 }
 
@@ -145,7 +171,7 @@ function renderPositionTables (accountId) {
     })
 
     _.each(['CAD', 'USD'], function (cur) {
-      byCurrency[cur] = _.sortByOrder(byCurrency[cur], ['portfolioWeight'], ['desc'])
+      byCurrency[cur] = _.orderBy(byCurrency[cur], ['portfolioWeight'], ['desc'])
       $('#' + cur.toLowerCase() + 'Positions').html(templates['position-table-template']({positions: byCurrency[cur], balance: cash[cur]}))
     })
   }
@@ -238,14 +264,12 @@ function renderPositionDetails ($positionRow) {
 }
 
 $(function () {
-  $('script[type="text/x-handlerbars-template"]').each(function (i, elem) {
-    templates[elem.id] = Handlebars.compile($(elem).html())
-  })
-
   Handlebars.registerHelper({
     'currency': function (amount) {
       if (amount == null) {
-        return '--'
+        return '&mdash;'
+      } else if (Math.abs(amount) < 0.001) {
+        return '0.00'
       } else if (amount >= 0) {
         return amount.toFixed(2)
       } else {

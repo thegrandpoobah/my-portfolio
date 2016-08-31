@@ -1,0 +1,21 @@
+<div class="container-fluid">
+  <div class="row"><div class="sidebar-header col-xs-12"><div class="bg-primary"><strong>Vitals</strong></div></div></div>
+  
+  <div class="row"><div class="col-xs-4"><strong>Symbol:</strong></div><div class="col-xs-8">{{symbol}} ({{listingExchange}})</div></div>
+  <div class="row"><div class="col-xs-4"><strong>Description:</strong></div><div class="col-xs-8">{{description}}</div></div>
+  <div class="row"><div class="col-xs-4"><strong>Dividend:</strong></div><div class="col-xs-8">{{currency dividend}}/{{yield}}% {{#if dividendDate}}({{date dividendDate}}){{/if}}</div></div>
+  <div class="row"><div class="col-xs-4"><strong>Currency:</strong></div><div class="col-xs-8">{{curr}}</div></div>
+  <div class="row"><div class="col-xs-4"><strong>52wk:</strong></div><div class="col-xs-8">{{currency lowPrice52}} - {{currency highPrice52}}</div></div>
+  <div class="row"><div class="col-xs-4"><strong>EPS:</strong></div><div class="col-xs-8">{{eps}}</div></div>
+  <div class="row"><div class="col-xs-4"><strong>P/E:</strong></div><div class="col-xs-8">{{pe}}</div></div>
+  <div class="row"><div class="col-xs-4"><strong>Volume (20/90):</strong></div><div class="col-xs-8">{{averageVol20Days}}/{{averageVol3Months}}</div></div>
+  <div class="row"><div class="col-xs-4"><strong>Market Cap:</strong></div><div class="col-xs-8">{{marketCap}}</div></div>
+  
+  {{#if hasIndustry}}
+  <div class="row"><div class="sidebar-header col-xs-12"><div class="bg-primary"><strong>Industry</strong></div></div></div>
+  
+  <div class="row"><div class="col-xs-4"><strong>Sector:</strong></div><div class="col-xs-8">{{industrySector}}</div></div>
+  <div class="row"><div class="col-xs-4"><strong>Group:</strong></div><div class="col-xs-8">{{industryGroup}}</div></div>
+  <div class="row"><div class="col-xs-4"><strong>Subgroup:</strong></div><div class="col-xs-8">{{industrySubgroup}}</div></div>
+  {{/if}}
+</div>
