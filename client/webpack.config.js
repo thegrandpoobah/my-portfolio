@@ -13,7 +13,7 @@ module.exports = {
         robots: ["file?name=robots.txt!./app/robots.txt"]
     },
     output: {
-        path: path.join(__dirname, 'dist'),
+        path: path.join(__dirname, '../dist/static'),
         publicPath: '/',
         filename: "scripts/app.[chunkhash].js"
     },
