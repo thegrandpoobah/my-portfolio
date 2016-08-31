@@ -1,0 +1,9 @@
+{
+  "id": "aws",
+  "secret": {
+    "encrypted_data": "Q6JIzBqSIwXk/BIef3zfYUkiIwmtdmwO2x6WyhgLXZOt+PjM0AHDd+ybXtir\na9oC\n",
+    "iv": "ICubeiNfvuS/kNHUo+naBg==\n",
+    "version": 1,
+    "cipher": "aes-256-cbc"
+  }
+}

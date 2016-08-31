@@ -7,3 +7,5 @@ authorization*.json
 server.zip
 aws secret.txt
 server/config/production.json
+encrypted_data_bag_secret
+.vagrant

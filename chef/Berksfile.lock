@@ -1,0 +1,49 @@
+DEPENDENCIES
+  cron (~> 1.7.6)
+  magic_shell
+  main
+    path: site-cookbooks/main
+  my-portfolio
+    path: .
+    metadata: true
+  nodejs
+    git: https://github.com/redguide/nodejs.git
+    revision: 11577692dd2b5fd7da9b87b1fa20dae02d8b2a41
+
+GRAPH
+  apt (4.0.2)
+    compat_resource (>= 12.10)
+  ark (1.2.0)
+    build-essential (>= 0.0.0)
+    seven_zip (>= 0.0.0)
+    windows (>= 0.0.0)
+  build-essential (6.0.4)
+    compat_resource (>= 12.10)
+    mingw (>= 1.1)
+    seven_zip (>= 0.0.0)
+  chef_handler (1.4.0)
+  compat_resource (12.14.0)
+  cron (1.7.6)
+  homebrew (2.1.0)
+    build-essential (>= 2.1.2)
+  magic_shell (1.0.0)
+  main (0.0.0)
+    magic_shell (>= 0.0.0)
+    nodejs (>= 2.4.4)
+  mingw (1.2.4)
+    compat_resource (>= 0.0.0)
+    seven_zip (>= 0.0.0)
+  my-portfolio (0.0.0)
+  nodejs (2.4.5)
+    apt (>= 2.9.1)
+    ark (>= 0.0.0)
+    build-essential (>= 0.0.0)
+    homebrew (>= 0.0.0)
+    yum-epel (>= 0.0.0)
+  seven_zip (2.0.2)
+    windows (>= 1.2.2)
+  windows (1.44.3)
+    chef_handler (>= 0.0.0)
+  yum (3.12.0)
+  yum-epel (0.7.1)
+    yum (>= 3.6.3)
