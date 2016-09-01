@@ -1,0 +1,4 @@
+name 'main'
+
+depends "nodejs", ">= 2.4.4"
+depends "magic_shell"
