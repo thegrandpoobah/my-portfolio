@@ -3,6 +3,9 @@ DEPENDENCIES
   magic_shell
   main
     path: site-cookbooks/main
+  monit
+    git: https://github.com/phlipper/chef-monit.git
+    revision: f027aea655a0ef2ea6d0b7bdde00975268a82ef9
   my-portfolio
     path: .
     metadata: true
@@ -29,10 +32,13 @@ GRAPH
   magic_shell (1.0.0)
   main (0.0.0)
     magic_shell (>= 0.0.0)
+    monit (>= 0.0.0)
     nodejs (>= 2.4.4)
   mingw (1.2.4)
     compat_resource (>= 0.0.0)
     seven_zip (>= 0.0.0)
+  monit (1.5.4)
+    build-essential (>= 0.0.0)
   my-portfolio (0.0.0)
   nodejs (2.4.5)
     apt (>= 2.9.1)
