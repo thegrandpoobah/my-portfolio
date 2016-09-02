@@ -1,6 +1,6 @@
 check process my-portfolio with pidfile "/var/run/my-portfolio.pid"
-  start program "/bin/bash -c 'cd /srv/www/current ; node server.js & ; echo "$!" > /var/run/my-portfolio.pid"
-  stop program "/usr/bin/pkill -f 'node'"
+  start program = "/bin/bash -c 'source /srv/www/shared/app.env ; /usr/local/bin/my-portfolio >> /var/log/my-portfolio.log 2>&1'"
+  stop program = "/usr/bin/pkill -F /var/run/my-portfolio.pid"
   if failed port 80 protocol HTTP
   	request /health.html
   	with timeout 10 seconds

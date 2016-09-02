@@ -6,5 +6,6 @@ cookbook 'nodejs', git: 'https://github.com/redguide/nodejs.git'
 cookbook 'magic_shell'
 cookbook 'cron', '~> 1.7.6'
 cookbook 'monit', git: 'https://github.com/phlipper/chef-monit.git'
+cookbook 'aws', '~> 3.4.1'
 
 cookbook 'main', path: './site-cookbooks/main'
