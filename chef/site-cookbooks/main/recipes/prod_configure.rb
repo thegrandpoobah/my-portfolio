@@ -1,6 +1,7 @@
 include_recipe 'monit'
 
 package 'zip'
+package 'sqlite3'
 
 monit_monitrc "my-portfolio" do
   variables({})
