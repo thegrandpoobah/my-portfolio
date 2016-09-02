@@ -73,7 +73,7 @@ app.get('/api/*', function (req, res) {
 app.use(express.static(config.get('static_assets')))
 
 app.set('etag', false)
-var server = app.listen(config.get('server_port'), function () {
+var server = app.listen(config.get('server_port'), 'localhost', function () {
   var host = server.address().address
   var port = server.address().port
 
