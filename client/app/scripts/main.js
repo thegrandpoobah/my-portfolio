@@ -139,7 +139,7 @@ function renderPositionTables (accountId) {
 
     var cash = {}
     _.each(balances.perCurrencyBalances, function (balance) {
-      balance.portfolioWeight = balance.cash / balance.marketValue
+      balance.portfolioWeight = balance.cash / balance.totalEquity
       balance.cost = 0
       balance.openPnl = 0
       balance.percentageOpenPnl = 0
@@ -161,10 +161,10 @@ function renderPositionTables (accountId) {
 
       position.percentageOpenPnl = position.openPnl / position.totalCost
       position.percentageClosedPnl = position.closedPnl / position.totalCost
-      position.portfolioWeight = position.currentMarketValue / cash[position.currency].marketValue
+      position.portfolioWeight = position.currentMarketValue / cash[position.currency].totalEquity
 
       cash[position.currency].cost += position.totalCost
-      cash[position.currency].openPnl = cash[position.currency].marketValue - cash[position.currency].cost
+      cash[position.currency].openPnl = cash[position.currency].totalEquity - cash[position.currency].cost
       cash[position.currency].percentageOpenPnl = cash[position.currency].openPnl / cash[position.currency].cost
 
       byCurrency[position.currency].push(position)

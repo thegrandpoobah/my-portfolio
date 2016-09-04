@@ -33,7 +33,7 @@ function publishToDb (number, balances) {
             now.unix(),
             cur,
             balances[cur].cash,
-            balances[cur].marketValue,
+            balances[cur].totalEquity,
             balances[cur].cost,
             function (err) {
               if (err) {
