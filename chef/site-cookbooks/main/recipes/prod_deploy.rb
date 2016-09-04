@@ -12,6 +12,10 @@ EOF
   group 'root'
 end
 
+monit_monitrc "my-portfolio" do
+  variables({})
+end
+
 app = search("aws_opsworks_app").first
 
 aws_s3_file '/tmp/my-portfolio.zip' do
@@ -19,10 +23,6 @@ aws_s3_file '/tmp/my-portfolio.zip' do
 	remote_path 'server.zip'
 	aws_access_key app['app_source']['user']
 	aws_secret_access_key app['app_source']['password']
-end
-
-execute 'shutdown my-portfolio' do
-	command 'monit stop my-portfolio'
 end
 
 directory '/srv/www/current' do 
@@ -62,7 +62,21 @@ template '/srv/www/shared/app.env' do
 	)
 end
 
-execute 'start up my-portfolio' do
-	command 'monit start my-portfolio'
+execute 'restart my-portfolio' do
+	command 'monit restart my-portfolio'
+	returns [0, 1]
 end
 
+cron "store account mv" do
+  minute "00"
+  hour "23"
+  weekday "1-5"
+
+  program = [
+    "cd /srv/www/current",
+    "source /srv/www/shared/app.env",
+    "/usr/bin/env NODE_PATH=#/srv/www/current/node_modules:/srv/www/current /usr/local/bin/node cron/storeaccountmv.js >> /var/log/my-portfolio-cron.log 2>&1"
+  ].join ' ; '
+
+  command "/bin/bash -c '#{program}'"
+end
