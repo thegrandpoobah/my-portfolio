@@ -3,6 +3,9 @@ dist
 .tmp
 authorization*.json
 *.db
-server.zip
+*.zip
+*.tar.gz
 aws secret.txt
 server/config/production.json
+encrypted_data_bag_secret
+.vagrant
