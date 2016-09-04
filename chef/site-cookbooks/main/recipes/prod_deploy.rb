@@ -1,4 +1,5 @@
 include_recipe 'aws'
+include_recipe 'monit'
 
 file '/usr/local/bin/my-portfolio' do
   content <<-EOF
