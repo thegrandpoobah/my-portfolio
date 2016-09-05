@@ -46,5 +46,14 @@
       <th class="text-right">{{currency balance.totalEquity}}</th>
       <th class="hidden-sm {{currencyClass balance.openPnl}}">{{currency balance.openPnl}} ({{format balance.percentageOpenPnl format="0.00%"}})</th>
     </tr>
+    <tr class="hidden-sm hidden-md hidden-lg nohover">
+      <th colspan="2">Total Market Value</th>
+      <th class="text-right hidden-xs"></th>
+      <th class="text-right hidden-xs"></th>
+      <th class="text-right hidden-xs"></th>
+      <th class="text-right"></th>
+      <th class="text-right">{{currency balance.totalEquity}}</th>
+      <th class="hidden-xs hidden-sm"></th>
+    </tr>
   </tfoot>
 </table>
