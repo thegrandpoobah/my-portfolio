@@ -15,18 +15,18 @@
   {{#positions}}
     <tr class="position-row">
       <td><a href="#" data-symbolid="{{symbolId}}"><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span>{{symbol}}</a></td>
-      <td class="text-right hidden-xs">{{percentage portfolioWeight}}</td>
-      <td class="text-right hidden-xs">{{openQuantity}}</td>
+      <td class="text-right hidden-xs">{{format portfolioWeight format="0.00%"}}</td>
+      <td class="text-right hidden-xs">{{format openQuantity format="0,0"}}</td>
       <td class="text-right">{{currency averageEntryPrice}}</td>
       <td class="text-right hidden-xs">{{currency totalCost}}</td>
       <td class="text-right">{{currency currentPrice}} {{{priceDifference dailyChange}}}</td>
       <td class="text-right">{{currency currentMarketValue}}</td>
-      <td class="hidden-xs hidden-sm {{currencyClass openPnl}}">{{currency openPnl}} ({{percentage percentageOpenPnl}}%)</td>
+      <td class="hidden-xs hidden-sm {{currencyClass openPnl}}">{{currency openPnl}} ({{format percentageOpenPnl format="0.00%"}})</td>
     </tr>
   {{/positions}}
     <tr class="nohover">
       <td>Cash</td>
-      <td class="text-right hidden-xs">{{percentage balance.portfolioWeight}}</td>
+      <td class="text-right hidden-xs">{{format balance.portfolioWeight format="0.00%"}}</td>
       <td class="text-right hidden-xs"></td>
       <td class="text-right"></td>
       <td class="text-right hidden-xs"></td>
@@ -44,7 +44,7 @@
       <th class="text-right">{{currency balance.cost}}</th>
       <th class="text-right"></th>
       <th class="text-right">{{currency balance.totalEquity}}</th>
-      <th class="hidden-sm {{currencyClass balance.openPnl}}">{{currency balance.openPnl}} ({{percentage balance.percentageOpenPnl}}%)</th>
+      <th class="hidden-sm {{currencyClass balance.openPnl}}">{{currency balance.openPnl}} ({{format balance.percentageOpenPnl format="0.00%"}})</th>
     </tr>
   </tfoot>
 </table>
