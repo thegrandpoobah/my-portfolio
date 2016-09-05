@@ -5,6 +5,7 @@ var _ = require('lodash')
 var Handlebars = require('handlebars/runtime')
 var MG = require('metrics-graphics')
 var moment = require('moment')
+var numeral = require('numeral')
 
 require('../styles/main.scss')
 require('../../../node_modules/metrics-graphics/dist/metricsgraphics.css')
@@ -265,6 +266,9 @@ function renderPositionDetails ($positionRow) {
 
 $(function () {
   Handlebars.registerHelper({
+    'format': function (num, opts) {
+      return numeral(num).format(opts.hash.format)
+    },
     'currency': function (amount) {
       if (amount == null) {
         return '&mdash;'
@@ -295,9 +299,6 @@ $(function () {
       } else {
         return '<span class="currency-negative">(<span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span>&nbsp;' + amount.toFixed(2) + ')</span>'
       }
-    },
-    'percentage': function (amount) {
-      return ((amount || 0 ) * 100).toFixed(2)
     },
     'date': function (date) {
       return moment(date, moment.ISO_8601).format('L')
