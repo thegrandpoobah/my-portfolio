@@ -17,7 +17,7 @@ function publishToDb (number, balances) {
       now.add(1, 'day')
 
       var delStmt = db.prepare('DELETE FROM mv WHERE number = ? AND date = ?')
-      delStmt.run(number, now.add(1, 'day').unix(), function (err) {
+      delStmt.run(number, now.unix(), function (err) {
         if (err) {
           reject(err)
         }
