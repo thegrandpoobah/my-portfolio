@@ -76,7 +76,7 @@ cron "store account mv" do
   program = [
     "cd /srv/www/current",
     "source /srv/www/shared/app.env",
-    "/usr/bin/env NODE_PATH=#/srv/www/current/node_modules:/srv/www/current /usr/local/bin/node cron/storeaccountmv.js >> /var/log/my-portfolio-cron.log 2>&1"
+    "/usr/bin/env NODE_PATH=#/srv/www/current/node_modules:/srv/www/current /usr/bin/node cron/storeaccountmv.js >> /var/log/my-portfolio-cron.log 2>&1"
   ].join ' ; '
 
   command "/bin/bash -c '#{program}'"
