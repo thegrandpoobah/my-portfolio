@@ -2,19 +2,19 @@ include_recipe 'aws'
 include_recipe 'monit'
 
 file '/usr/local/bin/my-portfolio' do
-  content <<-EOF
+	content <<-EOF
 #!/bin/bash
 cd /srv/www/current
 node server.js &
 echo "$!" > /var/run/my-portfolio.pid
 EOF
-  mode '0744'
-  owner 'root'
-  group 'root'
+	mode '0744'
+	owner 'root'
+	group 'root'
 end
 
 monit_monitrc "my-portfolio" do
-  variables({})
+	variables({})
 end
 
 app = search("aws_opsworks_app").first
@@ -69,15 +69,15 @@ execute 'restart my-portfolio' do
 end
 
 cron "store account mv" do
-  minute "00"
-  hour "23"
-  weekday "1-5"
+	minute "00"
+	hour "23"
+	weekday "1-5"
 
-  program = [
-    "cd /srv/www/current",
-    "source /srv/www/shared/app.env",
-    "/usr/bin/env NODE_PATH=#/srv/www/current/node_modules:/srv/www/current /usr/bin/node cron/storeaccountmv.js >> /var/log/my-portfolio-cron.log 2>&1"
-  ].join ' ; '
+	program = [
+		"cd /srv/www/current",
+		"source /srv/www/shared/app.env",
+		"/usr/bin/env NODE_PATH=#/srv/www/current/node_modules:/srv/www/current /usr/bin/node cron/storeaccountmv.js >> /var/log/my-portfolio-cron.log 2>&1"
+	].join ' ; '
 
-  command "/bin/bash -c '#{program}'"
+	command "/bin/bash -c '#{program}'"
 end
