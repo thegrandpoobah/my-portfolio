@@ -19,7 +19,7 @@
       <td class="text-right hidden-xs">{{format openQuantity format="0,0"}}</td>
       <td class="text-right">{{currency averageEntryPrice}}</td>
       <td class="text-right hidden-xs">{{currency totalCost}}</td>
-      <td class="text-right">{{currency currentPrice}} {{{priceDifference dailyChange}}}</td>
+      <td class="text-right">{{currency currentPrice}} <span class="daily-change">{{{priceDifference dailyChange format="0.00"}}}</span><span class="daily-change-percentage">{{{priceDifference dailyChangePercentage format="0.00%"}}}</span></td>
       <td class="text-right">{{currency currentMarketValue}}</td>
       <td class="hidden-xs hidden-sm {{currencyClass openPnl}}">{{currency openPnl}} ({{format percentageOpenPnl format="0.00%"}})</td>
     </tr>

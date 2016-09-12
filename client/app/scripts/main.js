@@ -6,9 +6,11 @@ var Handlebars = require('handlebars/runtime')
 var MG = require('metrics-graphics')
 var moment = require('moment')
 var numeral = require('numeral')
+require('bootstrap-switch')
 
 require('../styles/main.scss')
 require('../../../node_modules/metrics-graphics/dist/metricsgraphics.css')
+require('../../../node_modules/bootstrap-switch/dist/css/bootstrap3/bootstrap-switch.css')
 
 var templates = {
   'position-table-template': require('../templates/position-table.handlebars'),
@@ -198,6 +200,7 @@ function renderPositionTables (accountId) {
         var existing = bySymbol[symbol.symbol]
         _.assign(existing, symbol)
         existing.dailyChange = existing.currentPrice - existing.prevDayClosePrice
+        existing.dailyChangePercentage = existing.dailyChange / existing.currentPrice
       })
 
       onPositionLoadComplete(positions, balances)
@@ -291,13 +294,13 @@ $(function () {
         return 'currency-negative'
       }
     },
-    'priceDifference': function (amount) {
+    'priceDifference': function (amount, opts) {
       if (amount == null || Math.abs(amount) < 0.001) {
         return '(&mdash;)'
       } else if (amount >= 0) {
-        return '<span class="currency-positive">(<span class="glyphicon glyphicon-arrow-up" aria-hidden="true"></span>&nbsp;' + amount.toFixed(2) + ')</span>'
+        return '<span class="currency-positive">(<span class="glyphicon glyphicon-arrow-up" aria-hidden="true"></span>&nbsp;' + numeral(amount).format(opts.hash.format) + ')</span>'
       } else {
-        return '<span class="currency-negative">(<span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span>&nbsp;' + amount.toFixed(2) + ')</span>'
+        return '<span class="currency-negative">(<span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span>&nbsp;' + numeral(amount).format(opts.hash.format) + ')</span>'
       }
     },
     'date': function (date) {
@@ -323,5 +326,27 @@ $(function () {
     }
 
     e.preventDefault()
+  })
+
+  $('.daily-change-percentage').bootstrapSwitch({
+    onText: '%',
+    offText: '$',
+    size: 'mini',
+    onColor: 'primary',
+    offColor: 'primary',
+    state: false,
+    onSwitchChange: function(e, state) {
+      var container = $('#'+$(this).data('positionContainer'))
+      
+      if (state) {
+        container
+          .addClass('daily-change-percentage')
+          .removeClass('daily-change')
+      } else {
+        container
+          .addClass('daily-change')
+          .removeClass('daily-change-percentage')
+      }
+    }
   })
 })

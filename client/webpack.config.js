@@ -7,7 +7,7 @@ var FaviconsWebpackPlugin = require("favicons-webpack-plugin")
 module.exports = {
     entry: {
         app: "./app/scripts/main.js",
-        vendor: ["jquery", "lodash", "handlebars/runtime", "metrics-graphics", "moment", "modernizr"],
+        vendor: ["jquery", "lodash", "handlebars/runtime", "metrics-graphics", "moment", "modernizr", "bootstrap-switch"],
         bootstrap: ["bootstrap-loader/lib/bootstrap.loader?configFilePath="+__dirname+"/.bootstraprc!bootstrap-loader/no-op.js"],
         health: ["file?name=health.html!./app/health.html"],
         robots: ["file?name=robots.txt!./app/robots.txt"]
@@ -34,6 +34,9 @@ module.exports = {
     },
     devtool: 'source-map',
     plugins: [
+        new webpack.ProvidePlugin({
+            "window.jQuery": "jquery"
+        }),
         new webpack.optimize.UglifyJsPlugin({
             compress: {
                 warnings: false

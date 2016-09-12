@@ -147,3 +147,19 @@
     border-bottom: 0;
   }
 }
+
+.position-container.daily-change {
+  .position-row {
+    .daily-change-percentage {
+      display: none;
+    }
+  }
+}
+
+.position-container.daily-change-percentage {
+  .position-row {
+    .daily-change {
+      display: none;
+    }
+  }
+}
