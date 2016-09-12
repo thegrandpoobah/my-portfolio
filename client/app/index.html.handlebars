@@ -21,8 +21,13 @@
               <div><center><div class="legend-container"></div></center></div>
             </div>
           </div>
-          <div class="panel-heading custom-panel-heading"><strong>Positions</strong></div>
-          <div id="cadPositions" class="position-container"></div>
+          <div class="panel-heading custom-panel-heading clearfix">
+            <strong>Positions</strong>
+            <div class="pull-right">
+              <input type="checkbox" name="cadDailyChangePercentage" class="daily-change-percentage" data-position-container="cadPositions" />
+            </div>
+          </div>
+          <div id="cadPositions" class="position-container daily-change"></div>
         </div>
       </div>
       <div class="row">
@@ -32,8 +37,13 @@
             <div class="chart-container"></div>
             <div><center><div class="legend-container"></div></center></div>
           </div>
-          <div class="panel-heading custom-panel-heading"><strong>Positions</strong></div>
-          <div id="usdPositions" class="position-container"></div>
+          <div class="panel-heading custom-panel-heading clearfix">
+            <strong>Positions</strong>
+            <div class="pull-right">
+              <input type="checkbox" name="usdDailyChangePercentage" class="daily-change-percentage" data-position-container="usdPositions" />
+            </div>
+          </div>
+          <div id="usdPositions" class="position-container daily-change"></div>
         </div>
       </div>
     </div>
