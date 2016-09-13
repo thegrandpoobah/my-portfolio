@@ -298,9 +298,9 @@ $(function () {
       if (amount == null || Math.abs(amount) < 0.001) {
         return '(&mdash;)'
       } else if (amount >= 0) {
-        return '<span class="currency-positive">(<span class="glyphicon glyphicon-arrow-up" aria-hidden="true"></span>&nbsp;' + numeral(amount).format(opts.hash.format) + ')</span>'
+        return '<span class="currency-positive">(<span class="glyphicon glyphicon-arrow-up" aria-hidden="true"></span>' + numeral(amount).format(opts.hash.format) + ')</span>'
       } else {
-        return '<span class="currency-negative">(<span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span>&nbsp;' + numeral(amount).format(opts.hash.format) + ')</span>'
+        return '<span class="currency-negative">(<span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span>' + numeral(amount).format(opts.hash.format) + ')</span>'
       }
     },
     'date': function (date) {
