@@ -1,4 +1,4 @@
-include_recipe 'nodejs::nodejs_from_package'
+include_recipe 'nodejs'
 
 package 'build-essential'
 package 'git'
