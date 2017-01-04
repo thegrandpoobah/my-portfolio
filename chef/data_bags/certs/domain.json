@@ -1,0 +1,15 @@
+{
+  "id": "domain",
+  "domain": {
+    "encrypted_data": "C+j0pwyDrlB3McHc30l2Of5LBOuH1BcAAEmUJrkZ7QWwDExQ4g9JfpN2Rfnq\nsSln\n",
+    "iv": "Z8iOHe0y6D3yXPxuwreORQ==\n",
+    "version": 1,
+    "cipher": "aes-256-cbc"
+  },
+  "email": {
+    "encrypted_data": "sdRRzDNvVyvfdIE8kf//W0HYX9CqNdvlW2F/7NuBpXIzcTHThB7xu369Ob4n\nWB++\n",
+    "iv": "NMxZX6UKYyV/eKXy1SXL0Q==\n",
+    "version": 1,
+    "cipher": "aes-256-cbc"
+  }
+}
