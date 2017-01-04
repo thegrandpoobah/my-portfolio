@@ -1,7 +1,7 @@
 # Pre-Setup
 
 This repository contains encrypted data that requires a specific private
-key to decrypt. Either add the file `encrypted_data_bag_secret` to the 
+key to decrypt. Either add the matching file `encrypted_data_bag_secret` to the 
 root of this repository or regenerate the data using knife. Since the
 progject is using `chef-solo`, a couple of plug-ins for `knife` are also
 necessary:
