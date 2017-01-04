@@ -82,10 +82,8 @@ cron 'store account mv' do
 	command "/bin/bash -c '#{program}'"
 end
 
-domain_secrets = data_bag_item('certs', 'domain')
-
 execute 'generate first certificate' do
-	command "/usr/bin/certbot certonly --webroot -w /srv/www/current/static -d #{domain_secrets['domain']} --non-interactive --agree-tos --email #{domain_secrets['email']} --rsa-key-size 4096 --post-hook \"ln --force --symbolic /etc/letsencrypt/live/#{domain_secrets['domain']}/fullchain.pem /vol/db/localhost.crt; ln --force --symbolic /etc/letsencrypt/live/#{domain_secrets['domain']}/privkey.pem /vol/db/localhost.key; monit restart my-portfolio\""
+	command "/usr/bin/certbot certonly --webroot -w /srv/www/current/static -d #{node['domain']} --non-interactive --agree-tos --email #{node['email']} --rsa-key-size 4096 --post-hook \"ln --force --symbolic /etc/letsencrypt/live/#{node['domain']}/fullchain.pem /vol/db/localhost.crt; ln --force --symbolic /etc/letsencrypt/live/#{node['domain']}/privkey.pem /vol/db/localhost.key; monit restart my-portfolio\""
 end
 
 cron 'update ssl certificate' do
@@ -93,5 +91,5 @@ cron 'update ssl certificate' do
 	hour "11,23"
 	weekday "*"
 
-	command "/usr/bin/certbot renew --quiet --no-self-upgrade --post-hook \"ln --force --symbolic /etc/letsencrypt/live/#{domain_secrets['domain']}/fullchain.pem /vol/db/localhost.crt; ln --force --symbolic /etc/letsencrypt/live/#{domain_secrets['domain']}/privkey.pem /vol/db/localhost.key; monit restart my-portfolio\""
+	command "/usr/bin/certbot renew --quiet --no-self-upgrade --post-hook \"ln --force --symbolic /etc/letsencrypt/live/#{node['domain']}/fullchain.pem /vol/db/localhost.crt; ln --force --symbolic /etc/letsencrypt/live/#{node['domain']}/privkey.pem /vol/db/localhost.key; monit restart my-portfolio\""
 end
