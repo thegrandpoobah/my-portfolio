@@ -1,7 +1,10 @@
 {
-  "server_port": 3000,
+  "http_server_port": 3000,
+  "https_server_port": 3001,
   "database_uri": "../data/mv.db",
   "authorization_server": "../data/authorization_dev.json",
   "authorization_cron": "../data/authorization_dev.json",
-  "static_assets": "./static"
+  "static_assets": "../dist/static",
+  "private_key_file": "../data/localhost.key",
+  "certificate_file": "../data/localhost.crt"
 }

@@ -9,3 +9,7 @@ aws secret.txt
 server/config/production.json
 encrypted_data_bag_secret
 .vagrant
+data/localhost.crt
+data/localhost.key
+chef/Berksfile.lock
+chef/nodes/dev.json
