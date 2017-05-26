@@ -7,9 +7,6 @@ package 'zip'
 package 'awscli'
 package 'sqlite3'
 
-nodejs_npm "webpack"
-nodejs_npm "sqlite3"
-
 aws_secret = data_bag_item('passwords', 'aws')
 
 magic_shell_environment 'AWS_ACCESS_KEY_ID' do
@@ -20,7 +17,7 @@ magic_shell_environment 'AWS_SECRET_ACCESS_KEY' do
 	value aws_secret['aws_secret_access_key']
 end
 
-openssl_x509 '/home/vagrant/my-portfolio/data/localhost.crt' do
+openssl_x509 '/home/ubuntu/my-portfolio/data/localhost.crt' do
   common_name 'localhost'
   org 'My Portfolio'
   org_unit ''

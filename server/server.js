@@ -14,9 +14,9 @@ var port80forwarder = express()
 port80forwarder.use(function (req, res, next) {
   return res.redirect('https://' + req.headers.host + req.url)
 })
-http.createServer(port80forwarder).listen(config.get('http_server_port'), function () {
-  var host = server.address().address
-  var port = server.address().port
+var httpServer = http.createServer(port80forwarder).listen(config.get('http_server_port'), function () {
+  var host = httpServer.address().address
+  var port = httpServer.address().port
 
   log.info('web', 'Questrade API Proxy listening at http://%s:%s', host, port)
 })

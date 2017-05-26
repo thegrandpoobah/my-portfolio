@@ -13,3 +13,4 @@ data/localhost.crt
 data/localhost.key
 chef/Berksfile.lock
 chef/nodes/dev.json
+chef/ubuntu-xenial-16.04-cloudimg-console.log

@@ -1,3 +1,5 @@
+/* global Modernizr */
+
 require('modernizr')
 
 var $ = require('jquery')
@@ -335,9 +337,9 @@ $(function () {
     onColor: 'primary',
     offColor: 'primary',
     state: false,
-    onSwitchChange: function(e, state) {
-      var container = $('#'+$(this).data('positionContainer'))
-      
+    onSwitchChange: function (e, state) {
+      var container = $('#' + $(this).data('positionContainer'))
+
       if (state) {
         container
           .addClass('daily-change-percentage')
