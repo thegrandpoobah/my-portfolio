@@ -7,8 +7,6 @@ package 'zip'
 package 'awscli'
 package 'sqlite3'
 
-# nodejs_npm "sqlite3"
-
 aws_secret = data_bag_item('passwords', 'aws')
 
 magic_shell_environment 'AWS_ACCESS_KEY_ID' do
