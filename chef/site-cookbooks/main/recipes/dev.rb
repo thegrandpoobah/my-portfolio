@@ -6,6 +6,7 @@ package 'git'
 package 'zip'
 package 'awscli'
 package 'sqlite3'
+package 'htop'
 
 aws_secret = data_bag_item('passwords', 'aws')
 

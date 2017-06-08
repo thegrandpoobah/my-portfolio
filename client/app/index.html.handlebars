@@ -30,6 +30,7 @@
           <div id="cadPositions" class="position-container daily-change"></div>
         </div>
       </div>
+
       <div class="row">
         <div class="panel panel-default">
           <div class="panel-heading"><strong>USD Portfolio</strong></div>
@@ -44,6 +45,23 @@
             </div>
           </div>
           <div id="usdPositions" class="position-container daily-change"></div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="panel panel-default">
+          <div class="panel-heading"><strong>Cryptocurrency Portfolio</strong></div>
+          <div id="cryptoOverview" class="overview-container">
+            <div class="chart-container"></div>
+            <div><center><div class="legend-container"></div></center></div>
+          </div>
+          <div class="panel-heading custom-panel-heading clearfix">
+            <strong>Positions</strong>
+            <div class="pull-right">
+              <input type="checkbox" name="usdDailyChangePercentage" class="daily-change-percentage" data-position-container="cryptoPositions" />
+            </div>
+          </div>
+          <div id="cryptoPositions" class="position-container daily-change"></div>
         </div>
       </div>
     </div>

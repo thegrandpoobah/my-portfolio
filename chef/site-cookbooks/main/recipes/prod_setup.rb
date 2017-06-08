@@ -4,6 +4,7 @@ include_recipe 'openssl'
 
 package 'zip'
 package 'sqlite3'
+package 'htop'
 
 file '/vol/db/localhost.crt' do
   action :delete

@@ -16,7 +16,7 @@
     <tr class="position-row">
       <td><a href="#" data-symbolid="{{symbolId}}"><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span>{{symbol}}</a></td>
       <td class="text-right hidden-xs">{{format portfolioWeight format="0.00%"}}</td>
-      <td class="text-right hidden-xs">{{format openQuantity format="0,0"}}</td>
+      <td class="text-right hidden-xs">{{format openQuantity format="0.[00000000]"}}</td>
       <td class="text-right">{{currency averageEntryPrice}}</td>
       <td class="text-right hidden-xs">{{currency totalCost}}</td>
       <td class="text-right">{{currency currentPrice}} <span class="daily-change">{{{priceDifference dailyChange format="0.00"}}}</span><span class="daily-change-percentage">{{{priceDifference dailyChangePercentage format="0.00%"}}}</span></td>
