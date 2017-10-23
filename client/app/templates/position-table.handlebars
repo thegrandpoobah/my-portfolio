@@ -14,7 +14,7 @@
   <tbody>
   {{#positions}}
     <tr class="position-row">
-      <td><a href="#" data-symbolid="{{symbolId}}"><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span>{{symbol}}</a></td>
+      <td><a href="#" data-symbolid="{{symbolId}}" data-accountid="{{accountId}}"><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span>{{symbol}}</a></td>
       <td class="text-right hidden-xs">{{format portfolioWeight format="0.00%"}}</td>
       <td class="text-right hidden-xs">{{format openQuantity format="0,0"}}</td>
       <td class="text-right">{{currency averageEntryPrice}}</td>

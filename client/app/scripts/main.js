@@ -17,7 +17,9 @@ require('../../../node_modules/bootstrap-switch/dist/css/bootstrap3/bootstrap-sw
 var templates = {
   'position-table-template': require('../templates/position-table.handlebars'),
   'position-details-template': require('../templates/position-details.handlebars'),
-  'position-details-container-template': require('../templates/position-details-container.handlebars')
+  'position-activities-template': require('../templates/position-activities.handlebars'),
+  'position-details-container-template': require('../templates/position-details-container.handlebars'),
+  'activity-table-template': require('../templates/activity-table-template.handlebars')
 }
 
 var benchmarkMap = {
@@ -118,7 +120,7 @@ function renderOverviews (accountId) {
 
   var boundaries = getDateBoundaries()
 
-  $.getJSON('/api/accounts/' + accountId + '/candles?startTime=' + boundaries.startTime.format() + '&endTime=' + boundaries.endTime.format() + '&currency=CAD&interval=OneDay').then(function (resp) {
+  $.getJSON('/api/accounts/' + accountId + '/candles?startTime=' + boundaries.startTime.format() + '&endTime=' + boundaries.endTime.format()).then(function (resp) {
     _.each(['CAD', 'USD'], function (cur) {
       var portfolioPrices = createIndexedData(resp[cur])
 
@@ -177,7 +179,11 @@ function renderPositionTables (accountId) {
 
     _.each(['CAD', 'USD'], function (cur) {
       byCurrency[cur] = _.orderBy(byCurrency[cur], ['portfolioWeight'], ['desc'])
-      $('#' + cur.toLowerCase() + 'Positions').html(templates['position-table-template']({positions: byCurrency[cur], balance: cash[cur]}))
+      $('#' + cur.toLowerCase() + 'Positions').html(templates['position-table-template']({
+        accountId: accountId,
+        positions: byCurrency[cur],
+        balance: cash[cur]
+      }))
     })
   }
 
@@ -210,8 +216,28 @@ function renderPositionTables (accountId) {
   })
 }
 
+function renderActivities (accountId) {
+  $.getJSON('/api/accounts/' + accountId + '/activities').then(function (activities) {
+    var byCurrency = {}
+    var splitActivities = { 'USD': [], 'CAD': [] }
+
+    _.each(activities, function (activity) {
+      if (!byCurrency[activity.currency]) {
+        byCurrency[activity.currency] = []
+      }
+
+      byCurrency[activity.currency].push(activity)
+    })
+
+    _.each(['CAD', 'USD'], function(cur) {
+      $('#' + cur.toLowerCase() + 'Activities').html(templates['activity-table-template']({ activities: byCurrency[cur] }))
+    })
+  })
+}
+
 function renderPositionDetails ($positionRow) {
   var symbolId = $positionRow.find('a').data('symbolid')
+  var accountId = $positionRow.find('a').data('accountid')
 
   if ($('#symbol' + symbolId).length > 0) {
     $positionRow.find('a .glyphicon')
@@ -231,7 +257,7 @@ function renderPositionDetails ($positionRow) {
     stockInfo.curr = stockInfo.currency
     stockInfo.hasIndustry = stockInfo.industrySector || stockInfo.industryGroup || stockInfo.industrySubgroup
 
-    $('#symbol' + symbolId + ' .sidebar-container').html(templates['position-details-template'](stockInfo))
+    $('#symbol' + symbolId + ' .details-container').html(templates['position-details-template'](stockInfo))
 
     renderLoadingGraph('#symbol' + symbolId + ' .chart-container')
   })
@@ -240,7 +266,13 @@ function renderPositionDetails ($positionRow) {
 
   var symbolCandle = $.getJSON('/api/markets/candles/' + symbolId + '?startTime=' + boundaries.startTime.format() + '&endTime=' + boundaries.endTime.format() + '&interval=OneDay')
 
-  $.when(symbolInfo, symbolCandle).then(function (r1, r2) {
+  var symbolActivity = $.getJSON('/api/accounts/' + accountId + '/activities?symbolId=' + symbolId)
+
+  symbolActivity.then(function (resp) {
+    $('#symbol' + symbolId + ' .activities-container').html(templates['position-activities-template'](resp))
+  })
+
+  $.when(symbolInfo, symbolCandle).then(function (r1, r2, r3) {
     var stockInfo = r1[0].symbols[0]
     stockInfo.curr = stockInfo.currency
 
@@ -315,6 +347,7 @@ $(function () {
 
     renderOverviews(accountId)
     renderPositionTables(accountId)
+    renderActivities(accountId)
   })
 
   $('.position-container').on('click', 'tr.position-row', function (e) {

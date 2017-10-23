@@ -67,6 +67,139 @@ app.get('/api/accounts/:id/candles', function (req, res) {
   })
 })
 
+app.get('/api/accounts/:accountNumber/activities', function (req, res) {
+  var responded = false
+  var activities = []
+
+  db.each('SELECT * FROM activities WHERE accountNumber = ? AND symbolId = ? ORDER BY tradeDate', req.params.accountNumber, req.query.symbolId || 0, function (err, row) {
+    if (err) {
+      res.status(500).json({code: -1, message: err.toString()})
+      responded = true
+      return
+    }
+
+    row.tradeDate = moment.unix(row.tradeDate).format()
+    row.transactionDate = moment.unix(row.transactionDate).format()
+    row.settlementDate = moment.unix(row.settlementDate).format()
+
+    activities.push(row)
+  }, function (err) {
+    if (responded) {
+      return
+    }
+
+    if (err) {
+      res.status(500).json({code: -1, message: err.toString()})
+      return
+    }
+
+    res.json(activities)
+  })
+})
+
+function getActivity(accountNumber, id, callback) {
+  db.each('SELECT * FROM activities WHERE accountNumber = ? AND id = ?', accountNumber, id, function (err, row) {
+    if (err) {
+      callback(err, null)
+      return
+    }
+
+    callback(null, row)
+  }, function (err) {
+    if (err) {
+      callback(err, null)
+      return
+    }
+  })
+}
+
+function updateActivity(accountNumber, id, activity, callback) {
+  delete activity.id
+  delete activity.accountNumber
+
+  var updStmt = db.prepare('UPDATE activities SET (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) WHERE accountNumber = ? AND id = ?')
+
+  updStmt.run(
+    activity.tradeDate,
+    activity.transactionDate,
+    activity.settlementDate,
+    activity.action,
+    activity.symbol,
+    activity.symbolId,
+    activity.description,
+    activity.currency,
+    activity.quantity,
+    activity.price,
+    activity.grossAmount,
+    activity.commission,
+    activity.netAmount,
+    activity.type,
+    accountNumber,
+    id,
+    callback)
+}
+
+app.get('/api/accounts/:accountNumber/activities/:id', function (req, res) {
+  getActivity(req.params.accountNumber, req.params.id, function (err, activity) {
+    if (err) {
+      res.status(500).json({code: -1, message: err.toString()})
+      return
+    }
+
+    res.json(activity)
+  })
+})
+
+app.put('/api/accounts/:accountNumber/activities/:id', function (req, res) {
+  var activity
+
+  // TODO: get request body
+
+  updateActivity(req.params.accountNumber, req.params.id, activity, function (err) {
+    if (err) {
+      res.status(500).json({code: -1, message: err.toString()})
+      return
+    }
+
+    res.json({})
+  })
+})
+
+app.patch('/api/accounts/:accountNumber/activities/:id', function (req, res) {
+  getActivity(req.params.accountNumber, req.params.id, function (err, activity) {
+    if (err) {
+      res.status(500).json({code: -1, message: err.toString()})
+      return
+    }
+
+    // TODO: get request body
+
+    _.merge(activity, reqBody)
+
+    updateActivity(req.params.accountNumber, req.params.id, activity, function (err) {
+      if (err) {
+        res.status(500).json({code: -1, message: err.toString()})
+        return
+      }
+
+      res.json({})
+    })
+  })
+})
+
+app.delete('/api/accounts/:accountNumber/activities/:id', function (req, res) {
+  var delStmt = db.prepare('DELETE FROM activities WHERE accountNumber = ? AND id = ?')
+
+  delStmt.run(req.params.accountNumber, req.params.id, function (err) {
+    if (err) {
+      res.status(500).json({code: -1, message: err.toString()})
+      return
+    }
+
+    res.json({})
+  })
+})
+
 app.get('/api/*', function (req, res) {
   questrade.request('/v1' + req.originalUrl.substr(4), false).then(function (resp) {
     log.verbose(resp)
