@@ -109,7 +109,6 @@ questrade.request('/v1/accounts', true).then(function (resp) {
     var endTime = moment('2012-04-29').format()
 
     return questrade.request('/v1/accounts/' + account.number + '/activities?startTime=' + startTime + '&endTime=' + endTime, true).then(function(activities) {
-    // return questrade.request('/v1/accounts/' + account.number + '/activities?startTime=' + '2017-05-05T03:49:11' + '&endTime=' + '2017-06-05T03:49:11', true).then(function(activities) {
       return storeDailyAccountActivity(account.number, activities.activities)
     }).error(function (err) {
       log.error('sync', err)

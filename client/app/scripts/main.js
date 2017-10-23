@@ -25,7 +25,8 @@ var templates = {
 var benchmarkMap = {
   'TSX': 'TSX.IN',
   'NYSE': 'DJI.IN',
-  'NASDAQ': 'COMP.IN'
+  'NASDAQ': 'COMP.IN',
+  'COINSQUARE': 'DJI.IN'
 }
 
 function getDateBoundaries () {
@@ -109,29 +110,38 @@ function renderGraph (chartTarget, legendTarget, dataSeries) {
   })
 }
 
-function renderOverviews (accountId) {
-  var bmkMap = {
-    'CAD': 'TSX.IN',
-    'USD': 'DJI.IN'
+function renderOverviews (account) {
+  var bmkMap
+
+  if (account.type === 'Margin') {
+    bmkMap = {
+      'CAD': 'TSX.IN',
+      'USD': 'DJI.IN'
+    }
+  } else if (account.type === 'Cryptocurrency') {
+    bmkMap = {
+      'CRYPTO': 'DJI.IN'
+    }
   }
 
-  renderLoadingGraph('#cadOverview .chart-container')
-  renderLoadingGraph('#usdOverview .chart-container')
+  _.each(bmkMap, function (bmk, cur) {
+    renderLoadingGraph('#' + cur.toLowerCase() + 'Overview .chart-container')
+  })
 
   var boundaries = getDateBoundaries()
 
-  $.getJSON('/api/accounts/' + accountId + '/candles?startTime=' + boundaries.startTime.format() + '&endTime=' + boundaries.endTime.format()).then(function (resp) {
-    _.each(['CAD', 'USD'], function (cur) {
+  $.getJSON('/api/accounts/' + account.number + '/candles?startTime=' + boundaries.startTime.format() + '&endTime=' + boundaries.endTime.format()).then(function (resp) {
+    _.each(bmkMap, function (bmk, cur) {
       var portfolioPrices = createIndexedData(resp[cur])
 
-      findBenchmarkPrices(bmkMap[cur], boundaries).then(function (resp) {
+      findBenchmarkPrices(bmk, boundaries).then(function (resp) {
         renderGraph('#' + cur.toLowerCase() + 'Overview .chart-container', '#' + cur.toLowerCase() + 'Overview .legend-container', [
           {
             name: 'Portfolio',
             prices: portfolioPrices
           },
           {
-            name: bmkMap[cur],
+            name: bmk,
             prices: createIndexedData(resp.candles)
           }
         ])
@@ -154,10 +164,15 @@ function renderPositionTables (accountId) {
     })
 
     _.each(positions, function (position) {
-      if (position.symbol.lastIndexOf('.TO') === -1) {
-        position.currency = 'USD'
-      } else {
+      var isCAD = position.symbol.lastIndexOf('.TO') !== -1
+      var isCrypto = position.symbol.lastIndexOf('.CRYPTO') !== -1
+
+      if (isCrypto) {
+        position.currency = 'CRYPTO'
+      } else if (isCAD) {
         position.currency = 'CAD'
+      } else {
+        position.currency = 'USD'
       }
     })
 
@@ -177,7 +192,7 @@ function renderPositionTables (accountId) {
       byCurrency[position.currency].push(position)
     })
 
-    _.each(['CAD', 'USD'], function (cur) {
+    _.each(byCurrency, function (v, cur) {
       byCurrency[cur] = _.orderBy(byCurrency[cur], ['portfolioWeight'], ['desc'])
       $('#' + cur.toLowerCase() + 'Positions').html(templates['position-table-template']({
         accountId: accountId,
@@ -343,11 +358,11 @@ $(function () {
   })
 
   $.getJSON('/api/accounts').then(function (resp) {
-    var accountId = resp.accounts[0].number
-
-    renderOverviews(accountId)
-    renderPositionTables(accountId)
-    renderActivities(accountId)
+    _.each(resp.accounts, function (acct) {
+      renderOverviews(acct)
+      renderPositionTables(acct.number)
+      renderActivities(acct.number)
+    })
   })
 
   $('.position-container').on('click', 'tr.position-row', function (e) {
