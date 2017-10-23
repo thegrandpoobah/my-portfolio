@@ -1,6 +1,6 @@
 #/bin/bash
 rm -rf dist
-(cd ./client && webpack --progress --colors)
+(cd ./client && ../node_modules/webpack/bin/webpack.js --progress --colors)
 cp ./server/db.js ./dist/db.js
 cp ./package.json ./dist/package.json
 cp ./server/questrade.js ./dist/questrade.js
