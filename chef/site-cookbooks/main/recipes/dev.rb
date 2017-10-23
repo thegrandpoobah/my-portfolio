@@ -18,7 +18,7 @@ magic_shell_environment 'AWS_SECRET_ACCESS_KEY' do
 	value aws_secret['aws_secret_access_key']
 end
 
-openssl_x509 '/home/ubuntu/my-portfolio/data/localhost.crt' do
+openssl_x509 '/srv/www/data/localhost.crt' do
   common_name 'localhost'
   org 'My Portfolio'
   org_unit ''

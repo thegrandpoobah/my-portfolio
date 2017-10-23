@@ -1,3 +1,5 @@
+import 'babel-polyfill'
+
 var express = require('express')
 var compression = require('compression')
 var moment = require('moment-timezone')
@@ -13,17 +15,6 @@ var db = require('./db').connect()
 
 const SATOSHIS_PER_BITCOIN = 100000000
 const BTC_COST_BASIS = parseFloat(config.get('btc_cost_basis'))
-
-var port80forwarder = express()
-port80forwarder.use(function (req, res, next) {
-  return res.redirect('https://' + req.headers.host + req.url)
-})
-var httpServer = http.createServer(port80forwarder).listen(config.get('http_server_port'), function () {
-  var host = httpServer.address().address
-  var port = httpServer.address().port
-
-  log.info('web', 'Questrade API Proxy listening at http://%s:%s', host, port)
-})
 
 var app = express()
 
@@ -239,22 +230,22 @@ app.get('/api/accounts/:id/candles', function (req, res) {
   })
 })
 
-app.get('/api/accounts', function (req, res) {
-  questrade.request('v1' + req.originalUrl.substr(4))
-    .then(function (resp) {
-      resp.accounts.push({
-        type: 'Cryptocurrency',
-        number: 'cryptocurrency',
-        status: 'Active',
-        isPrimary: true,
-        isBilling: true,
-        clientAccountType: 'Individual'
-      })
-
-      res.status(200).json(resp)
-    }, function (err) {
-      res.status(err.statusCode).json({ code: err.code, message: err.message })
+app.get('/api/accounts', async (req, res) => {
+  try {
+    const resp = await questrade.request('/v1' + req.originalUrl.substr(4), true)
+    resp.accounts.push({
+      type: 'Cryptocurrency',
+      number: 'cryptocurrency',
+      status: 'Active',
+      isPrimary: true,
+      isBilling: true,
+      clientAccountType: 'Individual'
     })
+
+    res.status(200).json(resp)
+  } catch (ex) {
+    res.status(ex.statusCode).json({code: ex.code, message: ex.message})
+  }
 })
 
 app.get('/api/*', function (req, res) {
@@ -269,14 +260,23 @@ app.use(express.static(config.get('static_assets')))
 
 app.set('etag', false)
 
-var options = {
+const options = {
   key: fs.readFileSync(config.get('private_key_file')),
   cert: fs.readFileSync(config.get('certificate_file'))
 }
 
-var server = https.createServer(options, app).listen(config.get('https_server_port'), function () {
-  var host = server.address().address
-  var port = server.address().port
+const server = https.createServer(options, app).listen(config.get('https_server_port'), () => {
+  const { address, port } = server.address()
 
-  log.info('web', 'Questrade API Proxy listening at https://%s:%s', host, port)
+  log.info('web', 'Questrade API Proxy listening at https://%s:%s', address, port)
+})
+
+const port80forwarder = express()
+port80forwarder.use((req, res, next) => {
+  return res.redirect('https://' + req.headers.host + req.url)
+})
+const httpServer = http.createServer(port80forwarder).listen(config.get('http_server_port'), () => {
+  const { address, port } = httpServer.address()
+
+  log.info('web', 'Questrade API Proxy listening at http://%s:%s', address, port)
 })
