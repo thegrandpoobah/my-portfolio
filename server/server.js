@@ -8,6 +8,7 @@ var log = require('npmlog')
 var config = require('config')
 var fs = require('fs')
 var questrade = require('./questrade').init(config.get('authorization_server'))
+var { blockchainRequest, cbixRequest } = require('./blockchain')
 var db = require('./db').connect()
 
 const SATOSHIS_PER_BITCOIN = 100000000
@@ -28,95 +29,7 @@ var app = express()
 
 app.use(compression())
 
-function blockchainRequest (endpoint, asObject) {
-  return new Promise(function (resolve, reject) {
-    log.info('blockchain', 'Making data request to endpoint %s', endpoint)
-
-    var opts = {
-      host: 'blockchain.info',
-      path: endpoint,
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    }
-
-    var req = https.request(opts, function (res) {
-      var responseString = ''
-
-      res.on('data', function (data) {
-        responseString += data
-      })
-
-      res.on('end', function () {
-        if (res.statusCode !== 200) {
-          reject(_.assign(JSON.parse(responseString), {statusCode: res.statusCode}))
-          return
-        }
-
-        if (asObject) {
-          resolve(JSON.parse(responseString))
-        } else {
-          resolve(responseString)
-        }
-      })
-
-      res.on('error', function (e) {
-        reject({code: -1, message: e.toString(), statusCode: 500})
-      })
-    })
-
-    req.end()
-  })
-}
-
-function cbixRequest (endpoint, asObject) {
-  return new Promise(function (resolve, reject) {
-    log.info('blockchain', 'Making data request to endpoint %s', endpoint)
-
-    var opts = {
-      host: 'api.cbix.ca',
-      path: endpoint,
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    }
-
-    var req = https.request(opts, function (res) {
-      var responseString = ''
-
-      res.on('data', function (data) {
-        responseString += data
-      })
-
-      res.on('end', function () {
-        if (res.statusCode !== 200) {
-          reject(_.assign(JSON.parse(responseString), {statusCode: res.statusCode}))
-          return
-        }
-
-        if (asObject) {
-          resolve(JSON.parse(responseString))
-        } else {
-          resolve(responseString)
-        }
-      })
-
-      res.on('error', function (e) {
-        reject({code: -1, message: e.toString(), statusCode: 500})
-      })
-    })
-
-    req.end()
-  })
-}
-
-app.get('/api/accounts/cryptocurrency/candles', function (req, res) {
-  res.status(200).json({msg: 'yo, i got a request'})
-})
 app.get('/api/accounts/cryptocurrency/balances', function (req, res) {
-  // res.status(200).json({msg: 'yo, i got a request'})
   blockchainRequest('/rawaddr/' + config.get('btc_watch_address'), true).then(function (resp) {
     blockchainRequest('/ticker', true).then(function (exchangeRates) {
       var v = exchangeRates['CAD'].last * resp.final_balance / SATOSHIS_PER_BITCOIN
