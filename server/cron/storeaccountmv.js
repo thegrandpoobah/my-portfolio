@@ -4,7 +4,11 @@ var moment = require('moment-timezone')
 var _ = require('lodash')
 var config = require('config')
 var questrade = require('../questrade').init(config.get('authorization_cron'))
+var { blockchainRequest, cbixRequest } = require('../blockchain')
 var db = require('../db').connect()
+
+const SATOSHIS_PER_BITCOIN = 100000000
+const BTC_COST_BASIS = 20130
 
 function publishToDb (number, balances) {
   return new Promise(function (resolve, reject) {
@@ -24,7 +28,7 @@ function publishToDb (number, balances) {
       })
 
       var insStmt = db.prepare('INSERT INTO mv VALUES(?, ?, ?, ?, ?, ?)')
-      Promise.map(['CAD', 'USD'], function (cur) {
+      Promise.map(_.keys(balances), function (cur) {
         return new Promise(function (resolve, reject) {
           log.info('sync', 'Storing market value for %s into db', cur)
 
@@ -70,23 +74,51 @@ function storeDailyAccountMV (number, positions, balances) {
 
 log.info('sync', 'Starting sync of account data')
 
-questrade.request('/v1/accounts', true).then(function (resp) {
-  Promise.each(resp.accounts, function (account) {
-    log.info('sync', 'Syncing for account %s', account.number)
+function storeQuestradeMV () {
+  return new Promise(function (resolve, reject) {
+    questrade.request('/v1/accounts', true).then(function (resp) {
+      Promise.each(resp.accounts, function (account) {
+        log.info('sync', 'Syncing for account %s', account.number)
 
-    return Promise.all([
-      questrade.request('/v1/accounts/' + account.number + '/balances', true),
-      questrade.request('/v1/accounts/' + account.number + '/positions', true)
-    ]).then(function (resp) {
-      return storeDailyAccountMV(account.number, resp[1].positions, resp[0])
+        return Promise.all([
+          questrade.request('/v1/accounts/' + account.number + '/balances', true),
+          questrade.request('/v1/accounts/' + account.number + '/positions', true)
+        ]).then(function ([positions, balances]) {
+          return storeDailyAccountMV(account.number, positions.positions, balances)
+        })
+      }).then(function () {
+        log.info('sync', 'Sync completed.')
+
+        resolve()
+      }).error(function (err) {
+        log.error('sync', err)
+
+        reject()
+      })
     })
-  }).then(function () {
-    log.info('sync', 'Sync completed.')
-
-    process.exit(0)
-  }).error(function (err) {
-    log.error('sync', err)
-
-    process.exit(1)
   })
+}
+
+function storeCryptocurrencyMV () {
+  return Promise.all([
+    blockchainRequest('/rawaddr/' + config.get('btc_watch_address'), true),
+    blockchainRequest('/ticker', true)
+  ]).then(function ([addr, exchangeRates]) {
+    return publishToDb('cryptocurrency', {
+      'CRYPTO': {
+        cash: 0,
+        totalEquity: addr.final_balance / SATOSHIS_PER_BITCOIN * exchangeRates['CAD'].last,
+        cost: BTC_COST_BASIS
+      }
+    })
+  })
+}
+
+Promise.all([
+  storeQuestradeMV(),
+  storeCryptocurrencyMV()
+]).then(function () {
+  process.exit(0)
+}).catch(function () {
+  process.exit(1)
 })

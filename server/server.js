@@ -8,9 +8,11 @@ var log = require('npmlog')
 var config = require('config')
 var fs = require('fs')
 var questrade = require('./questrade').init(config.get('authorization_server'))
+var { blockchainRequest, cbixRequest } = require('./blockchain')
 var db = require('./db').connect()
 
 const SATOSHIS_PER_BITCOIN = 100000000
+const BTC_COST_BASIS = 20130
 
 var port80forwarder = express()
 port80forwarder.use(function (req, res, next) {
@@ -27,95 +29,7 @@ var app = express()
 
 app.use(compression())
 
-function blockchainRequest (endpoint, asObject) {
-  return new Promise(function (resolve, reject) {
-    log.info('blockchain', 'Making data request to endpoint %s', endpoint)
-
-    var opts = {
-      host: 'blockchain.info',
-      path: endpoint,
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    }
-
-    var req = https.request(opts, function (res) {
-      var responseString = ''
-
-      res.on('data', function (data) {
-        responseString += data
-      })
-
-      res.on('end', function () {
-        if (res.statusCode !== 200) {
-          reject(_.assign(JSON.parse(responseString), {statusCode: res.statusCode}))
-          return
-        }
-
-        if (asObject) {
-          resolve(JSON.parse(responseString))
-        } else {
-          resolve(responseString)
-        }
-      })
-
-      res.on('error', function (e) {
-        reject({code: -1, message: e.toString(), statusCode: 500})
-      })
-    })
-
-    req.end()
-  })
-}
-
-function cbixRequest (endpoint, asObject) {
-  return new Promise(function (resolve, reject) {
-    log.info('blockchain', 'Making data request to endpoint %s', endpoint)
-
-    var opts = {
-      host: 'api.cbix.ca',
-      path: endpoint,
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    }
-
-    var req = https.request(opts, function (res) {
-      var responseString = ''
-
-      res.on('data', function (data) {
-        responseString += data
-      })
-
-      res.on('end', function () {
-        if (res.statusCode !== 200) {
-          reject(_.assign(JSON.parse(responseString), {statusCode: res.statusCode}))
-          return
-        }
-
-        if (asObject) {
-          resolve(JSON.parse(responseString))
-        } else {
-          resolve(responseString)
-        }
-      })
-
-      res.on('error', function (e) {
-        reject({code: -1, message: e.toString(), statusCode: 500})
-      })
-    })
-
-    req.end()
-  })
-}
-
-app.get('/api/accounts/cryptocurrency/candles', function (req, res) {
-  res.status(200).json({msg: 'yo, i got a request'})
-})
 app.get('/api/accounts/cryptocurrency/balances', function (req, res) {
-  // res.status(200).json({msg: 'yo, i got a request'})
   blockchainRequest('/rawaddr/' + config.get('btc_watch_address'), true).then(function (resp) {
     blockchainRequest('/ticker', true).then(function (exchangeRates) {
       var v = exchangeRates['CAD'].last * resp.final_balance / SATOSHIS_PER_BITCOIN
@@ -150,10 +64,10 @@ app.get('/api/accounts/cryptocurrency/positions', function (req, res) {
             closedQuantity: 0,
             currentMarketValue: resp.final_balance * exchangeRates['CAD'].last, // this is the BTC amount multiplied by the current spot rate
             currentPrice: exchangeRates['CAD'].last, // this is the current spot rate
-            averageEntryPrice: 20130 / resp.final_balance, // this is the amount of each transaction multiplied by the price of BTC at that transaction
+            averageEntryPrice: BTC_COST_BASIS / resp.final_balance, // this is the amount of each transaction multiplied by the price of BTC at that transaction
             closedPnl: 0,
-            openPnl: resp.final_balance * exchangeRates['CAD'].last - 20130,
-            totalCost: 20130,
+            openPnl: resp.final_balance * exchangeRates['CAD'].last - BTC_COST_BASIS,
+            totalCost: BTC_COST_BASIS,
             isRealTime: false,
             isUnderReorg: false
           }
@@ -163,15 +77,13 @@ app.get('/api/accounts/cryptocurrency/positions', function (req, res) {
   })
 })
 function getBtcSymbolInfo (req, res) {
-  blockchainRequest('/rawaddr/1GBwXkqCPYgN3QtTKYcdUDW4mpnyTEmha7', true).then(function (walletAddress) {
+  blockchainRequest('/rawaddr/' + config.get('btc_watch_address'), true).then(function (walletAddress) {
     walletAddress.final_balance /= SATOSHIS_PER_BITCOIN
 
-    blockchainRequest('/charts/total-bitcoins?timespan=1days&format=json', true).then(function (outstandingShares) {
+    blockchainRequest('/charts/total-bitcoins?timespan=2days&format=json', true).then(function (outstandingShares) {
       blockchainRequest('/charts/n-transactions?timespan=90days&format=json', true).then(function (volume) {
         blockchainRequest('/ticker', true).then(function (exchangeRates) {
           cbixRequest('/v1/history?limit=365', true).then(function (priceHistory) {
-            // console.dir(outstandingShares, volume, exchangeRates, priceHistory)
-
             res.status(200).json({
               symbols: [
                 {
@@ -181,10 +93,10 @@ function getBtcSymbolInfo (req, res) {
                   closedQuantity: 0,
                   currentMarketValue: walletAddress.final_balance * exchangeRates['CAD'].last, // this is the BTC amount multiplied by the current spot rate
                   currentPrice: exchangeRates['CAD'].last, // this is the current spot rate
-                  averageEntryPrice: 20130 / walletAddress.final_balance, // this is the amount of each transaction multiplied by the price of BTC at that transaction
+                  averageEntryPrice: BTC_COST_BASIS / walletAddress.final_balance, // this is the amount of each transaction multiplied by the price of BTC at that transaction
                   closedPnl: 0,
-                  openPnl: walletAddress.final_balance * exchangeRates['CAD'].last - 20130,
-                  totalCost: 20130,
+                  openPnl: walletAddress.final_balance * exchangeRates['CAD'].last - BTC_COST_BASIS,
+                  totalCost: BTC_COST_BASIS,
                   isRealTime: false,
                   isUnderReorg: false,
                   prevDayClosePrice: parseFloat(priceHistory.data[1].close),
@@ -192,13 +104,13 @@ function getBtcSymbolInfo (req, res) {
                   lowPrice52: parseFloat(_.minBy(priceHistory.data, function (x) { return parseFloat(x.low) }).low),
                   averageVol3Months: _.meanBy(volume.values, 'y'),
                   averageVol20Days: _.meanBy(_.takeRight(volume.values, 20), 'y'),
-                  outstandingShares: outstandingShares.values[0].y,
+                  outstandingShares: _.last(outstandingShares.values).y,
                   eps: null,
                   pe: null,
                   dividend: 0,
                   yield: 0,
                   exDate: null,
-                  marketCap: outstandingShares.values[0].y * exchangeRates['CAD'].last,
+                  marketCap: _.last(outstandingShares.values).y * exchangeRates['CAD'].last,
                   tradeUnit: 1 / SATOSHIS_PER_BITCOIN,
                   optionType: null,
                   optionDurationType: null,
