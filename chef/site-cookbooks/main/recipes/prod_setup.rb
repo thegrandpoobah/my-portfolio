@@ -1,6 +1,7 @@
 include_recipe 'nodejs'
 include_recipe 'monit'
 include_recipe 'openssl'
+include_recipe 'logrotate'
 
 package 'zip'
 package 'sqlite3'
@@ -50,4 +51,12 @@ cron 'update ssl certificate' do
   weekday "*"
 
   command "/usr/bin/certbot renew --quiet --no-self-upgrade --post-hook \"ln --force --symbolic /etc/letsencrypt/live/#{node['cert_domain']}/fullchain.pem /vol/db/localhost.crt; ln --force --symbolic /etc/letsencrypt/live/#{node['cert_domain']}/privkey.pem /vol/db/localhost.key; monit restart my-portfolio\""
+end
+
+logrotate_app 'my-portfolio' do
+  path ['/var/log/my-portfolio.log', '/var/log/my-portfolio-cron.log']
+  frequency 'daily'
+  rotate 30
+  create '644 root adm'
+  options ['missingok', 'compress', 'delaycompress', 'notifempty']
 end
