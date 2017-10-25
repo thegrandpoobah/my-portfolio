@@ -73,6 +73,7 @@ function storeDailyAccountMV (number, positions, balances) {
 }
 
 log.info('sync', 'Starting sync of account data')
+log.info('sync', moment().format())
 
 function storeQuestradeMV () {
   return new Promise(function (resolve, reject) {
