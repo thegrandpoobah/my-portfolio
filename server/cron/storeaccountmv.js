@@ -91,18 +91,19 @@ function storeQuestradeMV () {
 }
 
 function storeCryptocurrencyMV () {
-  return Promise.all([
-    blockchainRequest('/rawaddr/' + config.get('btc_watch_address'), true),
-    blockchainRequest('/ticker', true)
-  ]).then(function ([addr, exchangeRates]) {
-    return publishToDb('cryptocurrency', {
-      'CRYPTO': {
-        cash: 0,
-        totalEquity: addr.final_balance / SATOSHIS_PER_BITCOIN * exchangeRates['CAD'].last,
-        cost: BTC_COST_BASIS
-      }
+  return Promise
+    .all([
+      blockchainRequest('/rawaddr/' + config.get('btc_watch_address'), true),
+      blockchainRequest('/ticker', true)
+    ]).then(function ([addr, exchangeRates]) {
+      return publishToDb('cryptocurrency', {
+        'CRYPTO': {
+          cash: 0,
+          totalEquity: addr.final_balance / SATOSHIS_PER_BITCOIN * exchangeRates['CAD'].last,
+          cost: BTC_COST_BASIS
+        }
+      })
     })
-  })
 }
 
 Promise.all([
@@ -112,7 +113,7 @@ Promise.all([
   log.info('sync', 'Sync completed.')
 
   process.exit(0)
-}).error(function (err) {
+}, function (err) {
   log.error('sync', err)
 
   process.exit(1)
