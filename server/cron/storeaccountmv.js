@@ -83,7 +83,7 @@ function storeQuestradeMV () {
       return Promise.all([
         questrade.request('/v1/accounts/' + account.number + '/balances', true),
         questrade.request('/v1/accounts/' + account.number + '/positions', true)
-      ]).then(function ([positions, balances]) {
+      ]).then(function ([balances, positions]) {
         return storeDailyAccountMV(account.number, positions.positions, balances)
       })
     })

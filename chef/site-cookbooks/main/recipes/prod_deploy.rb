@@ -69,5 +69,5 @@ execute 'restart my-portfolio' do
 end
 
 execute 'generate first certificate' do
-	command "/usr/bin/certbot certonly --webroot -w /srv/www/current/static -d #{node['cert_domain']} --non-interactive --agree-tos --email #{node['cert_email']} --rsa-key-size 4096 --post-hook \"ln --force --symbolic /etc/letsencrypt/live/#{node['cert_domain']}/fullchain.pem /vol/db/localhost.crt; ln --force --symbolic /etc/letsencrypt/live/#{node['cert_domain']}/privkey.pem /vol/db/localhost.key; monit restart my-portfolio\""
+	command "/usr/bin/certbot certonly --webroot --force-renew -w /srv/www/current/static -d #{node['cert_domain']} --non-interactive --agree-tos --email #{node['cert_email']} --rsa-key-size 4096 --post-hook \"ln --force --symbolic /etc/letsencrypt/live/#{node['cert_domain']}/fullchain.pem /vol/db/localhost.crt; ln --force --symbolic /etc/letsencrypt/live/#{node['cert_domain']}/privkey.pem /vol/db/localhost.key; monit restart my-portfolio\""
 end
