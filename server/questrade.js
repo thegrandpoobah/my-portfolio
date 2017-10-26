@@ -36,7 +36,7 @@ function qtAuthorize (_auth) {
 
           res.on('end', function () {
             if (res.statusCode !== 200) {
-              log.error(responseString)
+              log.error('questrade', responseString)
               reject({code: -1, message: 'Internal Server Error', statusCode: 500})
               return
             }
