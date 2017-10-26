@@ -80,7 +80,7 @@ module.exports = {
           if (auth.refresh_token !== authorization.refresh_token) {
             authorization = auth
 
-            fs.writeFile(authorizationFile, JSON.stringify(auth), function (err) {
+            fs.writeFile(authorizationFile, JSON.stringify({refresh_token: auth.refresh_token}), function (err) {
               if (err) {
                 log.error(err)
               }
