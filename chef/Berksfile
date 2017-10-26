@@ -8,5 +8,6 @@ cookbook 'cron', '~> 1.7.6'
 cookbook 'monit', git: 'https://github.com/phlipper/chef-monit.git'
 cookbook 'aws', '~> 3.4.1'
 cookbook 'openssl', '~> 6.0.0'
+cookbook 'logrotate', '~> 2.2.0'
 
 cookbook 'main', path: './site-cookbooks/main'

@@ -73,27 +73,18 @@ function storeDailyAccountMV (number, positions, balances) {
 }
 
 log.info('sync', 'Starting sync of account data')
+log.info('sync', moment().format())
 
 function storeQuestradeMV () {
-  return new Promise(function (resolve, reject) {
-    questrade.request('/v1/accounts', true).then(function (resp) {
-      Promise.each(resp.accounts, function (account) {
-        log.info('sync', 'Syncing for account %s', account.number)
+  questrade.request('/v1/accounts', true).then(function (resp) {
+    return Promise.each(resp.accounts, function (account) {
+      log.info('sync', 'Syncing for account %s', account.number)
 
-        return Promise.all([
-          questrade.request('/v1/accounts/' + account.number + '/balances', true),
-          questrade.request('/v1/accounts/' + account.number + '/positions', true)
-        ]).then(function ([positions, balances]) {
-          return storeDailyAccountMV(account.number, positions.positions, balances)
-        })
-      }).then(function () {
-        log.info('sync', 'Sync completed.')
-
-        resolve()
-      }).error(function (err) {
-        log.error('sync', err)
-
-        reject()
+      return Promise.all([
+        questrade.request('/v1/accounts/' + account.number + '/balances', true),
+        questrade.request('/v1/accounts/' + account.number + '/positions', true)
+      ]).then(function ([balances, positions]) {
+        return storeDailyAccountMV(account.number, positions.positions, balances)
       })
     })
   })
@@ -118,7 +109,11 @@ Promise.all([
   storeQuestradeMV(),
   storeCryptocurrencyMV()
 ]).then(function () {
+  log.info('sync', 'Sync completed.')
+
   process.exit(0)
-}).catch(function () {
+}).error(function (err) {
+  log.error('sync', err)
+
   process.exit(1)
 })

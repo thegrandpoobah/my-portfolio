@@ -99,7 +99,7 @@ function getBtcSymbolInfo (req, res) {
                   totalCost: BTC_COST_BASIS,
                   isRealTime: false,
                   isUnderReorg: false,
-                  prevDayClosePrice: parseFloat(priceHistory.data[1].close),
+                  prevDayClosePrice: parseFloat(priceHistory.data[0].close),
                   highPrice52: parseFloat(_.maxBy(priceHistory.data, function (x) { return parseFloat(x.high) }).high),
                   lowPrice52: parseFloat(_.minBy(priceHistory.data, function (x) { return parseFloat(x.low) }).low),
                   averageVol3Months: _.meanBy(volume.values, 'y'),
