@@ -32,10 +32,10 @@ app.use(compression())
 app.get('/api/accounts/cryptocurrency/balances', function (req, res) {
   Promise
     .all([
-      blockchainRequest('/rawaddr/' + config.get('btc_watch_address'), true),
-      blockchainRequest('/ticker', true)
+      blockchainRequest('rawaddr/' + config.get('btc_watch_address')),
+      blockchainRequest('ticker')
     ])
-    .then(function([resp, exchangeRates]) {
+    .then(function ([resp, exchangeRates]) {
       var v = exchangeRates['CAD'].last * resp.final_balance / SATOSHIS_PER_BITCOIN
 
       res.status(200).json({
@@ -49,17 +49,17 @@ app.get('/api/accounts/cryptocurrency/balances', function (req, res) {
           isRealTime: true
         }]
       })
-    }, function(err) {
+    }, function (err) {
       res.status(err.statusCode).json({code: err.code, message: err.message})
     })
 })
 app.get('/api/accounts/cryptocurrency/positions', function (req, res) {
   Promise
     .all([
-      blockchainRequest('/rawaddr/' + config.get('btc_watch_address'), true),
-      blockchainRequest('/ticker', true)
+      blockchainRequest('rawaddr/' + config.get('btc_watch_address')),
+      blockchainRequest('ticker')
     ])
-    .then(function([resp, exchangeRates]) {
+    .then(function ([resp, exchangeRates]) {
       resp.final_balance /= SATOSHIS_PER_BITCOIN
 
       res.status(200).json({
@@ -78,20 +78,20 @@ app.get('/api/accounts/cryptocurrency/positions', function (req, res) {
           isUnderReorg: false
         }]
       })
-    }, function(err) {
+    }, function (err) {
       res.status(err.statusCode).json({code: err.code, message: err.message})
     })
 })
 function getBtcSymbolInfo (req, res) {
   Promise
     .all([
-      blockchainRequest('/rawaddr/' + config.get('btc_watch_address'), true),
-      blockchainRequest('/charts/total-bitcoins?timespan=2days&format=json', true),
-      blockchainRequest('/charts/n-transactions?timespan=90days&format=json', true),
-      blockchainRequest('/ticker', true),
-      cbixRequest('/v1/history?limit=365', true)
+      blockchainRequest('rawaddr/' + config.get('btc_watch_address')),
+      blockchainRequest('charts/total-bitcoins?timespan=2days&format=json'),
+      blockchainRequest('charts/n-transactions?timespan=90days&format=json'),
+      blockchainRequest('ticker'),
+      cbixRequest('v1/history?limit=365')
     ])
-    .then(function([walletAddress, outstandingShares, volume, exchangeRates, priceHistory]) {
+    .then(function ([walletAddress, outstandingShares, volume, exchangeRates, priceHistory]) {
       walletAddress.final_balance /= SATOSHIS_PER_BITCOIN
 
       res.status(200).json({
@@ -154,7 +154,7 @@ function getBtcSymbolInfo (req, res) {
           industrySubgroup: 'Cryptocurrency'
         }]
       })
-    }, function(err) {
+    }, function (err) {
       res.status(err.statusCode).json({code: err.code, message: err.message})
     })
 }
@@ -165,10 +165,8 @@ app.get('/api/symbols/', function (req, res) {
   if (req.query.names === 'BTC.CRYPTO') {
     getBtcSymbolInfo(req, res)
   } else {
-    questrade.request('/v1' + req.originalUrl.substr(4), false).then(function (resp) {
-      res.set({
-        'Content-Type': 'application/json'
-      }).send(resp)
+    questrade.request('v1' + req.originalUrl.substr(4)).then(function (resp) {
+      res.status(200).json(resp)
     }, function (err) {
       res.status(err.statusCode).json({code: err.code, message: err.message})
     })
@@ -177,7 +175,7 @@ app.get('/api/symbols/', function (req, res) {
 app.get('/api/markets/candles/btc', function (req, res) {
   // TODO: Actual date range information is not supported, the trick is
   // that the client only ever requests 1 year of data
-  cbixRequest('/v1/history?limit=365', true)
+  cbixRequest('v1/history?limit=365')
     .then(function (priceHistory) {
       res.status(200).json({
         candles: _.map(_.reverse(priceHistory.data), function (x) {
@@ -222,6 +220,7 @@ app.get('/api/accounts/:id/candles', function (req, res) {
 
     if (err) {
       res.status(500).json({code: -1, message: err.toString()})
+
       return
     }
 
@@ -240,9 +239,8 @@ app.get('/api/accounts/:id/candles', function (req, res) {
 })
 
 app.get('/api/accounts', function (req, res) {
-  questrade.request('/v1' + req.originalUrl.substr(4), false)
+  questrade.request('v1' + req.originalUrl.substr(4))
     .then(function (resp) {
-      resp = JSON.parse(resp)
       resp.accounts.push({
         type: 'Cryptocurrency',
         number: 'cryptocurrency',
@@ -253,18 +251,15 @@ app.get('/api/accounts', function (req, res) {
       })
 
       res.status(200).json(resp)
-    }, function(err) {
+    }, function (err) {
       res.status(err.statusCode).json({code: err.code, message: err.message})
     })
 })
 
 app.get('/api/*', function (req, res) {
-  questrade.request('/v1' + req.originalUrl.substr(4), false)
+  questrade.request('v1' + req.originalUrl.substr(4))
     .then(function (resp) {
-      log.verbose(resp)
-      res.set({
-        'Content-Type': 'application/json'
-      }).send(resp)
+      res.status(200).json(resp)
     }, function (err) {
       res.status(err.statusCode).json({code: err.code, message: err.message})
     })
