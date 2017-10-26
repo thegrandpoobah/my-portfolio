@@ -76,13 +76,13 @@ log.info('sync', 'Starting sync of account data')
 log.info('sync', moment().format())
 
 function storeQuestradeMV () {
-  questrade.request('/v1/accounts', true).then(function (resp) {
+  questrade.request('v1/accounts').then(function (resp) {
     return Promise.each(resp.accounts, function (account) {
       log.info('sync', 'Syncing for account %s', account.number)
 
       return Promise.all([
-        questrade.request('/v1/accounts/' + account.number + '/balances', true),
-        questrade.request('/v1/accounts/' + account.number + '/positions', true)
+        questrade.request('v1/accounts/' + account.number + '/balances'),
+        questrade.request('v1/accounts/' + account.number + '/positions')
       ]).then(function ([balances, positions]) {
         return storeDailyAccountMV(account.number, positions.positions, balances)
       })
@@ -91,18 +91,19 @@ function storeQuestradeMV () {
 }
 
 function storeCryptocurrencyMV () {
-  return Promise.all([
-    blockchainRequest('/rawaddr/' + config.get('btc_watch_address'), true),
-    blockchainRequest('/ticker', true)
-  ]).then(function ([addr, exchangeRates]) {
-    return publishToDb('cryptocurrency', {
-      'CRYPTO': {
-        cash: 0,
-        totalEquity: addr.final_balance / SATOSHIS_PER_BITCOIN * exchangeRates['CAD'].last,
-        cost: BTC_COST_BASIS
-      }
+  return Promise
+    .all([
+      blockchainRequest('rawaddr/' + config.get('btc_watch_address')),
+      blockchainRequest('ticker')
+    ]).then(function ([addr, exchangeRates]) {
+      return publishToDb('cryptocurrency', {
+        'CRYPTO': {
+          cash: 0,
+          totalEquity: addr.final_balance / SATOSHIS_PER_BITCOIN * exchangeRates['CAD'].last,
+          cost: BTC_COST_BASIS
+        }
+      })
     })
-  })
 }
 
 Promise.all([
@@ -112,7 +113,7 @@ Promise.all([
   log.info('sync', 'Sync completed.')
 
   process.exit(0)
-}).error(function (err) {
+}, function (err) {
   log.error('sync', err)
 
   process.exit(1)
