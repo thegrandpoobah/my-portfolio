@@ -5,6 +5,7 @@ require('modernizr')
 var $ = require('jquery')
 var _ = require('lodash')
 var Handlebars = require('handlebars/runtime')
+var d3 = require('d3')
 var MG = require('metrics-graphics')
 var moment = require('moment')
 var numeral = require('numeral')
@@ -104,7 +105,8 @@ function renderGraph (chartTarget, legendTarget, dataSeries) {
     inflator: 1,
     y_rug: true,
     baselines: [{value: 1, label: '100%'}],
-    markers: markers
+    markers: markers,
+    interpolate: d3.curveLinear
   })
 }
 
