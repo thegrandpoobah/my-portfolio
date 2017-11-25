@@ -1,9 +1,7 @@
 var fs = require('fs')
 var request = require('request-promise')
-var https = require('https')
 var Promise = require('bluebird')
 var moment = require('moment')
-var url = require('url')
 var log = require('npmlog')
 var _ = require('lodash')
 
