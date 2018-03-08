@@ -36,15 +36,16 @@ app.get('/api/accounts/cryptocurrency/balances', function (req, res) {
       blockchainRequest('ticker')
     ])
     .then(function ([resp, exchangeRates]) {
-      var v = exchangeRates['CAD'].last * resp[config.get('btc_watch_address')].final_balance / SATOSHIS_PER_BITCOIN
+      var final_balance = resp[config.get('btc_watch_address')].final_balance
+      var market_value = exchangeRates['CAD'].last * final_balance / SATOSHIS_PER_BITCOIN
 
       res.status(200).json({
         perCurrencyBalances: [{
           currency: 'CRYPTO',
           cash: 0,
-          marketValue: v,
-          totalEquity: v,
-          buyingPower: v,
+          marketValue: market_value,
+          totalEquity: market_value,
+          buyingPower: market_value,
           maintenanceExcess: 0,
           isRealTime: true
         }]
