@@ -12,7 +12,7 @@ var { blockchainRequest, cbixRequest } = require('./blockchain')
 var db = require('./db').connect()
 
 const SATOSHIS_PER_BITCOIN = 100000000
-const BTC_COST_BASIS = 20130
+const BTC_COST_BASIS = config.get('btc_cost_basis')
 
 var port80forwarder = express()
 port80forwarder.use(function (req, res, next) {
@@ -32,19 +32,20 @@ app.use(compression())
 app.get('/api/accounts/cryptocurrency/balances', function (req, res) {
   Promise
     .all([
-      blockchainRequest('rawaddr/' + config.get('btc_watch_address')),
+      blockchainRequest('balance?active=' + config.get('btc_watch_address')),
       blockchainRequest('ticker')
     ])
     .then(function ([resp, exchangeRates]) {
-      var v = exchangeRates['CAD'].last * resp.final_balance / SATOSHIS_PER_BITCOIN
+      var final_balance = resp[config.get('btc_watch_address')].final_balance
+      var market_value = exchangeRates['CAD'].last * final_balance / SATOSHIS_PER_BITCOIN
 
       res.status(200).json({
         perCurrencyBalances: [{
           currency: 'CRYPTO',
           cash: 0,
-          marketValue: v,
-          totalEquity: v,
-          buyingPower: v,
+          marketValue: market_value,
+          totalEquity: market_value,
+          buyingPower: market_value,
           maintenanceExcess: 0,
           isRealTime: true
         }]
@@ -56,23 +57,23 @@ app.get('/api/accounts/cryptocurrency/balances', function (req, res) {
 app.get('/api/accounts/cryptocurrency/positions', function (req, res) {
   Promise
     .all([
-      blockchainRequest('rawaddr/' + config.get('btc_watch_address')),
+      blockchainRequest('balance?active=' + config.get('btc_watch_address')),
       blockchainRequest('ticker')
     ])
     .then(function ([resp, exchangeRates]) {
-      resp.final_balance /= SATOSHIS_PER_BITCOIN
+      var final_balance = resp[config.get('btc_watch_address')].final_balance / SATOSHIS_PER_BITCOIN
 
       res.status(200).json({
         positions: [{
           symbol: 'BTC.CRYPTO',
           symbolId: 'btc',
-          openQuantity: resp.final_balance,
+          openQuantity: final_balance,
           closedQuantity: 0,
-          currentMarketValue: resp.final_balance * exchangeRates['CAD'].last, // this is the BTC amount multiplied by the current spot rate
+          currentMarketValue: final_balance * exchangeRates['CAD'].last, // this is the BTC amount multiplied by the current spot rate
           currentPrice: exchangeRates['CAD'].last, // this is the current spot rate
-          averageEntryPrice: BTC_COST_BASIS / resp.final_balance, // this is the amount of each transaction multiplied by the price of BTC at that transaction
+          averageEntryPrice: BTC_COST_BASIS / final_balance, // this is the amount of each transaction multiplied by the price of BTC at that transaction
           closedPnl: 0,
-          openPnl: resp.final_balance * exchangeRates['CAD'].last - BTC_COST_BASIS,
+          openPnl: final_balance * exchangeRates['CAD'].last - BTC_COST_BASIS,
           totalCost: BTC_COST_BASIS,
           isRealTime: false,
           isUnderReorg: false
@@ -85,26 +86,26 @@ app.get('/api/accounts/cryptocurrency/positions', function (req, res) {
 function getBtcSymbolInfo (req, res) {
   Promise
     .all([
-      blockchainRequest('rawaddr/' + config.get('btc_watch_address')),
+      blockchainRequest('balance?active=' + config.get('btc_watch_address')),
       blockchainRequest('charts/total-bitcoins?timespan=2days&format=json'),
       blockchainRequest('charts/n-transactions?timespan=90days&format=json'),
       blockchainRequest('ticker'),
       cbixRequest('v1/history?limit=365')
     ])
     .then(function ([walletAddress, outstandingShares, volume, exchangeRates, priceHistory]) {
-      walletAddress.final_balance /= SATOSHIS_PER_BITCOIN
+      var final_balance = walletAddress[config.get('btc_watch_address')].final_balance / SATOSHIS_PER_BITCOIN
 
       res.status(200).json({
         symbols: [{
           symbol: 'BTC.CRYPTO',
           symbolId: 'btc',
-          openQuantity: walletAddress.final_balance,
+          openQuantity: final_balance,
           closedQuantity: 0,
-          currentMarketValue: walletAddress.final_balance * exchangeRates['CAD'].last, // this is the BTC amount multiplied by the current spot rate
+          currentMarketValue: final_balance * exchangeRates['CAD'].last, // this is the BTC amount multiplied by the current spot rate
           currentPrice: exchangeRates['CAD'].last, // this is the current spot rate
-          averageEntryPrice: BTC_COST_BASIS / walletAddress.final_balance, // this is the amount of each transaction multiplied by the price of BTC at that transaction
+          averageEntryPrice: BTC_COST_BASIS / final_balance, // this is the amount of each transaction multiplied by the price of BTC at that transaction
           closedPnl: 0,
-          openPnl: walletAddress.final_balance * exchangeRates['CAD'].last - BTC_COST_BASIS,
+          openPnl: final_balance * exchangeRates['CAD'].last - BTC_COST_BASIS,
           totalCost: BTC_COST_BASIS,
           isRealTime: false,
           isUnderReorg: false,
