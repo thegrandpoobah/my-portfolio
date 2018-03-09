@@ -8,6 +8,7 @@ You must be running VirtualBox, Vagrant, ChefDK, and a couple plug-ins for this 
 * vagrant-berkshelf (`vagrant plugin install vagrant-berkshelf`)
 * vagrant-vbguest (`vagrant plugin install vagrant-vbguest`)
 * vagrant-fsnotify (`vagrant plugin install vagrant-fsnotify`)
+* vagrant-triggers (`vagrant plugin install vagrant-triggers`)
 * vagrant-omnibus (`vagrant plugin install vagrant-omnibus`)
 * knife-solo (`cd chef && gem install knife-solo`)
 * knife-solo_data_bag (`cd chef && gem install knife-solo_data_bag`)

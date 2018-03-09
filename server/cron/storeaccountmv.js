@@ -8,7 +8,7 @@ var { blockchainRequest, cbixRequest } = require('../blockchain')
 var db = require('../db').connect()
 
 const SATOSHIS_PER_BITCOIN = 100000000
-const BTC_COST_BASIS = 20130
+const BTC_COST_BASIS = parseFloat(config.get('btc_cost_basis'))
 
 function publishToDb (number, balances) {
   return new Promise(function (resolve, reject) {
@@ -93,13 +93,14 @@ function storeQuestradeMV () {
 function storeCryptocurrencyMV () {
   return Promise
     .all([
-      blockchainRequest('rawaddr/' + config.get('btc_watch_address')),
+      blockchainRequest('balance?active=' + config.get('btc_watch_address')),
       blockchainRequest('ticker')
-    ]).then(function ([addr, exchangeRates]) {
+    ]).then(function ([resp, exchangeRates]) {
+      var final_balance = resp[config.get('btc_watch_address')].final_balance
       return publishToDb('cryptocurrency', {
         'CRYPTO': {
           cash: 0,
-          totalEquity: addr.final_balance / SATOSHIS_PER_BITCOIN * exchangeRates['CAD'].last,
+          totalEquity: final_balance / SATOSHIS_PER_BITCOIN * exchangeRates['CAD'].last,
           cost: BTC_COST_BASIS
         }
       })
