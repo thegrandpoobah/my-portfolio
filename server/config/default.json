@@ -7,5 +7,6 @@
   "static_assets": "../dist/static",
   "private_key_file": "../data/localhost.key",
   "certificate_file": "../data/localhost.crt",
-  "btc_watch_address": ""
+  "btc_watch_address": "",
+  "btc_cost_basis": ""
 }

@@ -12,7 +12,7 @@ var { blockchainRequest, cbixRequest } = require('./blockchain')
 var db = require('./db').connect()
 
 const SATOSHIS_PER_BITCOIN = 100000000
-const BTC_COST_BASIS = config.get('btc_cost_basis')
+const BTC_COST_BASIS = parseFloat(config.get('btc_cost_basis'))
 
 var port80forwarder = express()
 port80forwarder.use(function (req, res, next) {

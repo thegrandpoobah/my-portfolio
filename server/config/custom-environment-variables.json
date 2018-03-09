@@ -1,3 +1,4 @@
 {
-  "btc_watch_address": "BTC_WATCH_ADDRESS"
+  "btc_watch_address": "BTC_WATCH_ADDRESS",
+  "btc_cost_basis": "BTC_COST_BASIS"
 }
