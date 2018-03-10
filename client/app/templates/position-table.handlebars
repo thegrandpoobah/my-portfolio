@@ -13,8 +13,14 @@
   </thead>
   <tbody>
   {{#positions}}
-    <tr class="position-row">
-      <td><a href="#" data-symbolid="{{symbolId}}"><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span>{{symbol}}</a></td>
+    <tr class="position-row"
+      data-symbolid="{{symbolId}}"
+      data-portfolio-weight="{{portfolioWeight}}"
+      data-open-quantity="{{openQuantity}}"
+      data-total-cost="{{totalCost}}"
+      data-open-pnl="{{openPnl}}"
+      data-percentage-open-pnl="{{percentageOpenPnl}}">
+      <td><a href="#"><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span>{{symbol}}</a></td>
       <td class="text-right hidden-xs">{{format portfolioWeight format="0.00%"}}</td>
       <td class="text-right hidden-xs">{{format openQuantity format="0.[00000000]"}}</td>
       <td class="text-right">{{currency averageEntryPrice}}</td>

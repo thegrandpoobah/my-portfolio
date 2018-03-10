@@ -4,7 +4,7 @@ var moment = require('moment-timezone')
 var _ = require('lodash')
 var config = require('config')
 var questrade = require('../questrade').init(config.get('authorization_cron'))
-var { blockchainRequest, cbixRequest } = require('../blockchain')
+var { blockchainRequest } = require('../blockchain')
 var db = require('../db').connect()
 
 const SATOSHIS_PER_BITCOIN = 100000000
@@ -96,11 +96,11 @@ function storeCryptocurrencyMV () {
       blockchainRequest('balance?active=' + config.get('btc_watch_address')),
       blockchainRequest('ticker')
     ]).then(function ([resp, exchangeRates]) {
-      var final_balance = resp[config.get('btc_watch_address')].final_balance
+      var finalBalance = resp[config.get('btc_watch_address')].final_balance
       return publishToDb('cryptocurrency', {
         'CRYPTO': {
           cash: 0,
-          totalEquity: final_balance / SATOSHIS_PER_BITCOIN * exchangeRates['CAD'].last,
+          totalEquity: finalBalance / SATOSHIS_PER_BITCOIN * exchangeRates['CAD'].last,
           cost: BTC_COST_BASIS
         }
       })

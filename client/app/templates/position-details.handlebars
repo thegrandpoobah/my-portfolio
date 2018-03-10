@@ -1,4 +1,11 @@
 <div class="container-fluid">
+  <div class="row hidden-md hidden-lg"><div class="sidebar-header col-xs-12"><div class="bg-primary"><strong>Performance</strong></div></div></div>
+
+  <div class="row hidden-md hidden-lg"><div class="col-xs-4"><strong>Weight:</strong></div><div class="col-xs-8">{{format portfolioWeight format="0.00%"}}</div></div>
+  <div class="row hidden-md hidden-lg"><div class="col-xs-4"><strong>Shares:</strong></div><div class="col-xs-8">{{format openQuantity format="0.[00000000]"}}</div></div>
+  <div class="row hidden-md hidden-lg"><div class="col-xs-4"><strong>Cost:</strong></div><div class="col-xs-8">{{currency totalCost}}</div></div>
+  <div class="row hidden-md hidden-lg"><div class="col-xs-4"><strong>Unrealized Gains:</strong></div><div class="col-xs-8 {{currencyClass openPnl}}">{{currency openPnl}} ({{format percentageOpenPnl format="0.00%"}})</div></div>
+  
   <div class="row"><div class="sidebar-header col-xs-12"><div class="bg-primary"><strong>Vitals</strong></div></div></div>
   
   <div class="row"><div class="col-xs-4"><strong>Symbol:</strong></div><div class="col-xs-8">{{symbol}} ({{listingExchange}})</div></div>

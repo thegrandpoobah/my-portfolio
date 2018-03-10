@@ -104,7 +104,7 @@ function renderGraph (chartTarget, legendTarget, dataSeries) {
     format: 'percentage',
     inflator: 1,
     y_rug: true,
-    baselines: [{value: 1, label: '100%'}],
+    baselines: [{ value: 1, label: '100%' }],
     markers: markers,
     interpolate: d3.curveLinear
   })
@@ -194,7 +194,7 @@ function renderPositionTables (accountId) {
 
     _.each(byCurrency, function (v, cur) {
       byCurrency[cur] = _.orderBy(byCurrency[cur], ['portfolioWeight'], ['desc'])
-      $('#' + cur.toLowerCase() + 'Positions').html(templates['position-table-template']({positions: byCurrency[cur], balance: cash[cur]}))
+      $('#' + cur.toLowerCase() + 'Positions').html(templates['position-table-template']({ positions: byCurrency[cur], balance: cash[cur] }))
     })
   }
 
@@ -228,7 +228,7 @@ function renderPositionTables (accountId) {
 }
 
 function renderPositionDetails ($positionRow) {
-  var symbolId = $positionRow.find('a').data('symbolid')
+  var symbolId = $positionRow.data('symbolid')
 
   if ($('#symbol' + symbolId).length > 0) {
     $positionRow.find('a .glyphicon')
@@ -245,8 +245,15 @@ function renderPositionDetails ($positionRow) {
   symbolInfo.then(function (resp) {
     var stockInfo = resp.symbols[0]
 
-    stockInfo.curr = stockInfo.currency
-    stockInfo.hasIndustry = stockInfo.industrySector || stockInfo.industryGroup || stockInfo.industrySubgroup
+    _.extend(stockInfo, {
+      curr: stockInfo.currency,
+      hasIndustry: stockInfo.industrySector || stockInfo.industryGroup || stockInfo.industrySubgroup,
+      portfolioWeight: $positionRow.data('portfolio-weight'),
+      openQuantity: $positionRow.data('open-quantity'),
+      totalCost: $positionRow.data('total-cost'),
+      openPnl: $positionRow.data('open-pnl'),
+      percentageOpenPnl: $positionRow.data('percentage-open-pnl')
+    })
 
     $('#symbol' + symbolId + ' .sidebar-container').html(templates['position-details-template'](stockInfo))
 
@@ -283,7 +290,7 @@ function renderPositionDetails ($positionRow) {
     .removeClass('glyphicon-menu-right')
     .addClass('glyphicon-menu-down')
     .end()
-    .after(templates['position-details-container-template']({symbolId: symbolId}))
+    .after(templates['position-details-container-template']({ symbolId: symbolId }))
 }
 
 $(function () {

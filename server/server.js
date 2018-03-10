@@ -36,22 +36,22 @@ app.get('/api/accounts/cryptocurrency/balances', function (req, res) {
       blockchainRequest('ticker')
     ])
     .then(function ([resp, exchangeRates]) {
-      var final_balance = resp[config.get('btc_watch_address')].final_balance
-      var market_value = exchangeRates['CAD'].last * final_balance / SATOSHIS_PER_BITCOIN
+      var finalBalance = resp[config.get('btc_watch_address')].final_balance
+      var marketValue = exchangeRates['CAD'].last * finalBalance / SATOSHIS_PER_BITCOIN
 
       res.status(200).json({
         perCurrencyBalances: [{
           currency: 'CRYPTO',
           cash: 0,
-          marketValue: market_value,
-          totalEquity: market_value,
-          buyingPower: market_value,
+          marketValue: marketValue,
+          totalEquity: marketValue,
+          buyingPower: marketValue,
           maintenanceExcess: 0,
           isRealTime: true
         }]
       })
     }, function (err) {
-      res.status(err.statusCode).json({code: err.code, message: err.message})
+      res.status(err.statusCode).json({ code: err.code, message: err.message })
     })
 })
 app.get('/api/accounts/cryptocurrency/positions', function (req, res) {
@@ -61,26 +61,26 @@ app.get('/api/accounts/cryptocurrency/positions', function (req, res) {
       blockchainRequest('ticker')
     ])
     .then(function ([resp, exchangeRates]) {
-      var final_balance = resp[config.get('btc_watch_address')].final_balance / SATOSHIS_PER_BITCOIN
+      var finalBalance = resp[config.get('btc_watch_address')].final_balance / SATOSHIS_PER_BITCOIN
 
       res.status(200).json({
         positions: [{
           symbol: 'BTC.CRYPTO',
           symbolId: 'btc',
-          openQuantity: final_balance,
+          openQuantity: finalBalance,
           closedQuantity: 0,
-          currentMarketValue: final_balance * exchangeRates['CAD'].last, // this is the BTC amount multiplied by the current spot rate
+          currentMarketValue: finalBalance * exchangeRates['CAD'].last, // this is the BTC amount multiplied by the current spot rate
           currentPrice: exchangeRates['CAD'].last, // this is the current spot rate
-          averageEntryPrice: BTC_COST_BASIS / final_balance, // this is the amount of each transaction multiplied by the price of BTC at that transaction
+          averageEntryPrice: BTC_COST_BASIS / finalBalance, // this is the amount of each transaction multiplied by the price of BTC at that transaction
           closedPnl: 0,
-          openPnl: final_balance * exchangeRates['CAD'].last - BTC_COST_BASIS,
+          openPnl: finalBalance * exchangeRates['CAD'].last - BTC_COST_BASIS,
           totalCost: BTC_COST_BASIS,
           isRealTime: false,
           isUnderReorg: false
         }]
       })
     }, function (err) {
-      res.status(err.statusCode).json({code: err.code, message: err.message})
+      res.status(err.statusCode).json({ code: err.code, message: err.message })
     })
 })
 function getBtcSymbolInfo (req, res) {
@@ -93,19 +93,19 @@ function getBtcSymbolInfo (req, res) {
       cbixRequest('v1/history?limit=365')
     ])
     .then(function ([walletAddress, outstandingShares, volume, exchangeRates, priceHistory]) {
-      var final_balance = walletAddress[config.get('btc_watch_address')].final_balance / SATOSHIS_PER_BITCOIN
+      var finalBalance = walletAddress[config.get('btc_watch_address')].final_balance / SATOSHIS_PER_BITCOIN
 
       res.status(200).json({
         symbols: [{
           symbol: 'BTC.CRYPTO',
           symbolId: 'btc',
-          openQuantity: final_balance,
+          openQuantity: finalBalance,
           closedQuantity: 0,
-          currentMarketValue: final_balance * exchangeRates['CAD'].last, // this is the BTC amount multiplied by the current spot rate
+          currentMarketValue: finalBalance * exchangeRates['CAD'].last, // this is the BTC amount multiplied by the current spot rate
           currentPrice: exchangeRates['CAD'].last, // this is the current spot rate
-          averageEntryPrice: BTC_COST_BASIS / final_balance, // this is the amount of each transaction multiplied by the price of BTC at that transaction
+          averageEntryPrice: BTC_COST_BASIS / finalBalance, // this is the amount of each transaction multiplied by the price of BTC at that transaction
           closedPnl: 0,
-          openPnl: final_balance * exchangeRates['CAD'].last - BTC_COST_BASIS,
+          openPnl: finalBalance * exchangeRates['CAD'].last - BTC_COST_BASIS,
           totalCost: BTC_COST_BASIS,
           isRealTime: false,
           isUnderReorg: false,
@@ -156,7 +156,7 @@ function getBtcSymbolInfo (req, res) {
         }]
       })
     }, function (err) {
-      res.status(err.statusCode).json({code: err.code, message: err.message})
+      res.status(err.statusCode).json({ code: err.code, message: err.message })
     })
 }
 app.get('/api/symbols/btc', function (req, res) {
@@ -169,7 +169,7 @@ app.get('/api/symbols/', function (req, res) {
     questrade.request('v1' + req.originalUrl.substr(4)).then(function (resp) {
       res.status(200).json(resp)
     }, function (err) {
-      res.status(err.statusCode).json({code: err.code, message: err.message})
+      res.status(err.statusCode).json({ code: err.code, message: err.message })
     })
   }
 })
@@ -193,7 +193,7 @@ app.get('/api/markets/candles/btc', function (req, res) {
         })
       })
     }, function (err) {
-      res.status(err.statusCode).json({code: err.code, message: err.message})
+      res.status(err.statusCode).json({ code: err.code, message: err.message })
     })
 })
 app.get('/api/accounts/:id/candles', function (req, res) {
@@ -205,7 +205,7 @@ app.get('/api/accounts/:id/candles', function (req, res) {
 
   db.each('SELECT * FROM mv WHERE number = ? AND date >= ? AND date <= ?', req.params.id, startTime, endTime, function (err, row) {
     if (err) {
-      res.status(500).json({code: -1, message: err.toString()})
+      res.status(500).json({ code: -1, message: err.toString() })
       responded = true
       return
     }
@@ -220,7 +220,7 @@ app.get('/api/accounts/:id/candles', function (req, res) {
     }
 
     if (err) {
-      res.status(500).json({code: -1, message: err.toString()})
+      res.status(500).json({ code: -1, message: err.toString() })
 
       return
     }
@@ -253,7 +253,7 @@ app.get('/api/accounts', function (req, res) {
 
       res.status(200).json(resp)
     }, function (err) {
-      res.status(err.statusCode).json({code: err.code, message: err.message})
+      res.status(err.statusCode).json({ code: err.code, message: err.message })
     })
 })
 
@@ -262,7 +262,7 @@ app.get('/api/*', function (req, res) {
     .then(function (resp) {
       res.status(200).json(resp)
     }, function (err) {
-      res.status(err.statusCode).json({code: err.code, message: err.message})
+      res.status(err.statusCode).json({ code: err.code, message: err.message })
     })
 })
 app.use(express.static(config.get('static_assets')))
