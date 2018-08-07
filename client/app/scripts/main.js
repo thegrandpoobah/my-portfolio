@@ -152,7 +152,11 @@ function renderOverviews (account) {
 
 function renderPositionTables (accountId) {
   function onPositionLoadComplete (positions, balances) {
-    var byCurrency = {}
+    var byCurrency = {
+      'CAD': [],
+      'USD': [],
+      'CRYPTO': []
+    }
 
     var cash = {}
     _.each(balances.perCurrencyBalances, function (balance) {
@@ -177,10 +181,6 @@ function renderPositionTables (accountId) {
     })
 
     _.each(positions, function (position) {
-      if (_.isUndefined(byCurrency[position.currency])) {
-        byCurrency[position.currency] = []
-      }
-
       position.percentageOpenPnl = position.openPnl / position.totalCost
       position.percentageClosedPnl = position.closedPnl / position.totalCost
       position.portfolioWeight = position.currentMarketValue / cash[position.currency].totalEquity
