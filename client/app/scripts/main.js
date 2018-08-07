@@ -152,11 +152,7 @@ function renderOverviews (account) {
 
 function renderPositionTables (accountId) {
   function onPositionLoadComplete (positions, balances) {
-    var byCurrency = {
-      'CAD': [],
-      'USD': [],
-      'CRYPTO': []
-    }
+    var byCurrency = {}
 
     var cash = {}
     _.each(balances.perCurrencyBalances, function (balance) {
@@ -165,6 +161,7 @@ function renderPositionTables (accountId) {
       balance.openPnl = 0
       balance.percentageOpenPnl = 0
       cash[balance.currency] = balance
+      byCurrency[balance.currency] = []
     })
 
     _.each(positions, function (position) {
