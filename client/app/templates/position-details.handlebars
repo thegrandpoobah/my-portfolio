@@ -3,16 +3,16 @@
 
   <div class="row hidden-md hidden-lg"><div class="col-xs-4"><strong>Weight:</strong></div><div class="col-xs-8">{{format portfolioWeight format="0.00%"}}</div></div>
   <div class="row hidden-md hidden-lg"><div class="col-xs-4"><strong>Shares:</strong></div><div class="col-xs-8">{{format openQuantity format="0.[00000000]"}}</div></div>
-  <div class="row hidden-md hidden-lg"><div class="col-xs-4"><strong>Cost:</strong></div><div class="col-xs-8">{{currency totalCost}}</div></div>
-  <div class="row hidden-md hidden-lg"><div class="col-xs-4"><strong>Unrealized Gains:</strong></div><div class="col-xs-8 {{currencyClass openPnl}}">{{currency openPnl}} ({{format percentageOpenPnl format="0.00%"}})</div></div>
+  <div class="row hidden-md hidden-lg"><div class="col-xs-4"><strong>Cost:</strong></div><div class="col-xs-8">{{{currency totalCost}}}</div></div>
+  <div class="row hidden-md hidden-lg"><div class="col-xs-4"><strong>Unrealized Gains:</strong></div><div class="col-xs-8 {{currencyClass openPnl}}">{{{currency openPnl}}} ({{format percentageOpenPnl format="0.00%"}})</div></div>
   
   <div class="row"><div class="sidebar-header col-xs-12"><div class="bg-primary"><strong>Vitals</strong></div></div></div>
   
   <div class="row"><div class="col-xs-4"><strong>Symbol:</strong></div><div class="col-xs-8">{{symbol}} ({{listingExchange}})</div></div>
   <div class="row"><div class="col-xs-4"><strong>Description:</strong></div><div class="col-xs-8">{{description}}</div></div>
-  <div class="row"><div class="col-xs-4"><strong>Dividend:</strong></div><div class="col-xs-8">{{currency dividend}}/{{format yield format="0.00"}}% {{#if dividendDate}}({{date dividendDate}}){{/if}}</div></div>
+  <div class="row"><div class="col-xs-4"><strong>Dividend:</strong></div><div class="col-xs-8">{{{currency dividend}}}/{{format yield format="0.00"}}% {{#if dividendDate}}({{date dividendDate}}){{/if}}</div></div>
   <div class="row"><div class="col-xs-4"><strong>Currency:</strong></div><div class="col-xs-8">{{curr}}</div></div>
-  <div class="row"><div class="col-xs-4"><strong>52wk:</strong></div><div class="col-xs-8">{{currency lowPrice52}} - {{currency highPrice52}}</div></div>
+  <div class="row"><div class="col-xs-4"><strong>52wk:</strong></div><div class="col-xs-8">{{{currency lowPrice52}}} - {{{currency highPrice52}}}</div></div>
   <div class="row"><div class="col-xs-4"><strong>EPS:</strong></div><div class="col-xs-8">{{format eps format="0.00"}}</div></div>
   <div class="row"><div class="col-xs-4"><strong>P/E:</strong></div><div class="col-xs-8">{{format pe format="0.00"}}</div></div>
   <div class="row"><div class="col-xs-4"><strong>Volume (20/90):</strong></div><div class="col-xs-8">{{format averageVol20Days format="0.0[0000]a"}}/{{format averageVol3Months format="0.0[0000]a"}}</div></div>
