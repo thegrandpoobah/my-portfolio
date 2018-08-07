@@ -51,9 +51,9 @@ function createIndexedData (series) {
   var initialValue = Math.abs(series[0].open)
 
   _.each(series, function (datum) {
-    datum.index = datum.close / initialValue
+    datum.idx = datum.close / initialValue
   })
-  series[0].index = 1
+  series[0].idx = 1
 
   return series
 }
@@ -96,7 +96,7 @@ function renderGraph (chartTarget, legendTarget, dataSeries) {
     height: 400,
     target: chartTarget,
     x_accessor: 'end',
-    y_accessor: 'index',
+    y_accessor: 'idx',
     min_y_from_data: true,
     legend: _.map(dataSeries, 'name'),
     legend_target: legendTarget,
