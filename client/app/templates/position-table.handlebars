@@ -23,6 +23,12 @@
       <td><a href="#"><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span>{{symbol}}</a></td>
       <td class="text-right hidden-xs">{{format portfolioWeight format="0.00%"}}</td>
       <td class="text-right hidden-xs">{{format openQuantity format="0.[00000000]"}}</td>
+      <td class="text-right">{{{currency averageEntryPrice}}}</td>
+      <td class="text-right hidden-xs">{{{currency totalCost}}}</td>
+      <td class="text-right">{{{currency currentPrice}}} <span class="daily-change">{{{priceDifference dailyChange format="0.00"}}}</span><span class="daily-change-percentage">{{{priceDifference dailyChangePercentage format="0.00%"}}}</span></td>
+      <td class="text-right">{{{currency currentMarketValue}}}</td>
+      <td class="hidden-xs hidden-sm {{currencyClass openPnl}}">{{{currency openPnl}}} ({{format percentageOpenPnl format="0.00%"}})</td>
+    </tr>
   {{else}}
     <tr>
       <td colspan="8">
@@ -37,7 +43,7 @@
       <td class="text-right"></td>
       <td class="text-right hidden-xs"></td>
       <td class="text-right"></td>
-      <td class="text-right">{{currency balance.cash}}</td>
+      <td class="text-right">{{{currency balance.cash}}}</td>
       <td class="hidden-xs hidden-sm"></td>
     </tr>
   </tbody>
@@ -47,10 +53,10 @@
       <th class="text-right"></th>
       <th class="text-right"></th>
       <th class="text-right"></th>
-      <th class="text-right">{{currency balance.cost}}</th>
+      <th class="text-right">{{{currency balance.cost}}}</th>
       <th class="text-right"></th>
-      <th class="text-right">{{currency balance.totalEquity}}</th>
-      <th class="hidden-sm {{currencyClass balance.openPnl}}">{{currency balance.openPnl}} ({{format balance.percentageOpenPnl format="0.00%"}})</th>
+      <th class="text-right">{{{currency balance.totalEquity}}}</th>
+      <th class="hidden-sm {{currencyClass balance.openPnl}}">{{{currency balance.openPnl}}} ({{format balance.percentageOpenPnl format="0.00%"}})</th>
     </tr>
     <tr class="hidden-sm hidden-md hidden-lg nohover">
       <th colspan="2">Total Market Value</th>
@@ -58,7 +64,7 @@
       <th class="text-right hidden-xs"></th>
       <th class="text-right hidden-xs"></th>
       <th class="text-right"></th>
-      <th class="text-right">{{currency balance.totalEquity}}</th>
+      <th class="text-right">{{{currency balance.totalEquity}}}</th>
       <th class="hidden-xs hidden-sm"></th>
     </tr>
   </tfoot>
