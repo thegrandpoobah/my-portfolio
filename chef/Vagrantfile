@@ -31,5 +31,8 @@ Vagrant.configure("2") do |config|
         chef.add_recipe "main::dev"
     end
 
-    config.trigger.after :up do run "vagrant fsnotify" end
+    config.trigger.after :up do |trigger|
+        trigger.info = "Starting fsnotify"
+        trigger.run = {inline: "vagrant fsnotify"}
+    end
 end
