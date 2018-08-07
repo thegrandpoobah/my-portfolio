@@ -26,7 +26,7 @@ aws_s3_file '/tmp/my-portfolio.zip' do
 	aws_secret_access_key app['app_source']['password']
 end
 
-directory '/srv/www/current' do 
+directory '/srv/www/current' do
 	recursive true
 	action :delete
 end
@@ -61,6 +61,16 @@ template '/srv/www/shared/app.env' do
 	variables(
 		:environment => app['environment']
 	)
+end
+
+file '/vol/db/default.json' do
+  content ::IO.binread('/srv/www/current/config/default.json')
+  action :create
+end
+
+file '/vol/db/custom-environment-variables.json' do
+  content ::IO.binread('/srv/www/current/config/custom-environment-variables.json')
+  action :create
 end
 
 execute 'restart my-portfolio' do
