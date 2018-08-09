@@ -38,7 +38,7 @@ jobs:
             - run:
                 name: Install awscli
                 command: sudo pip install awscli
-            - attach_to_workspace:
+            - attach_workspace:
                 at: /tmp/workspace
             - run:
                 name: Deploy to S3
