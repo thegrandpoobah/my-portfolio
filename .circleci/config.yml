@@ -4,7 +4,7 @@ jobs:
         docker:
             - image: circleci/node:8-browsers
         steps:
-            checkout
+            - checkout
             - restore_cache:
                 keys:
                     - v1-npm-{{ checksum "package.json" }}
@@ -25,7 +25,7 @@ jobs:
         docker:
             - image: circleci/node:8-browsers
         steps:
-            checkout
+            - checkout
             - restore_cache:
                 keys:
                     - v1-npm-{{ checksum "package.json" }}
@@ -89,4 +89,3 @@ workflows:
                 # filters:
                 #     branches:
                 #         only: master
-                
