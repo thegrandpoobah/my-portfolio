@@ -4,10 +4,10 @@ jobs:
         docker:
             - image: circleci/node:8-browsers
         steps:
+            - checkout
             - restore_cache:
                 keys:
                     - npm-{{ checksum "package-lock.json" }}
-            - checkout
             - run:
                 name: Pull Dependencies
                 command: npm install
