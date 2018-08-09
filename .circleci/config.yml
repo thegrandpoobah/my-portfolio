@@ -1,6 +1,6 @@
 version: 2
 jobs:
-  build:
+  retrieve:
     docker:
       - image: circleci/node:8-browsers
     steps:
@@ -10,4 +10,13 @@ jobs:
           command: npm install
       - run:
           name: Build Client Side
-          command: (cd ./client && ../node_modules/webpack/bin/webpack.js --progress --colors)
+          command: (cd ./client && ../node_modules/webpack/bin/webpack.js --colors)
+      - run:
+          name: Build Server Side
+          command: cp -R ./server/* ./dist
+      - run:
+          name: package.json
+          command: cp ./package*.json ./dist
+      - run:
+          name: Package zip for S3
+          command: (cd ./dist && zip -r /tmp/server.zip ./*)
