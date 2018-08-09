@@ -92,10 +92,10 @@ workflows:
             - preamble
             - build-client
                 requires:
-                    - build
+                    - preamble
             - build-server
                 requires:
-                    - build
+                    - preamble
             - package
                 requires:
                     - build-client
