@@ -12,8 +12,7 @@ jobs:
                 name: Pull Dependencies
                 command: npm install
             - save_cache:
-                keys:
-                    - npm-{{ checksum "package-lock.json" }}
+                key: npm-{{ checksum "package-lock.json" }}
                 paths:
                     - "~/project/node_modules"
             - run:
