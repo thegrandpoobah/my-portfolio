@@ -1,30 +1,30 @@
 version: 2
 jobs:
-  build:
-    docker:
-      - image: circleci/node:8-browsers
-    steps:
-      - restore_cache:
-        keys:
-          - npm-{{ checksum "package-lock.json" }}
-      - checkout
-      - run:
-          name: Pull Dependencies
-          command: npm install
-      - save_cache:
-        keys:
-          - npm-{{ checksum "package-lock.json" }}
-          - paths:
-            - "~/project/node_modules"
-      - run:
-          name: Build Client Side
-          command: (cd ./client && ../node_modules/webpack/bin/webpack.js --colors)
-      - run:
-          name: Build Server Side
-          command: cp -R ./server/* ./dist
-      - run:
-          name: package.json
-          command: cp ./package*.json ./dist
-      - run:
-          name: Package zip for S3
-          command: (cd ./dist && zip -r /tmp/server.zip ./*)
+    build:
+        docker:
+            - image: circleci/node:8-browsers
+        steps:
+            - restore_cache:
+                keys:
+                    - npm-{{ checksum "package-lock.json" }}
+            - checkout
+            - run:
+                name: Pull Dependencies
+                command: npm install
+            - save_cache:
+                keys:
+                    - npm-{{ checksum "package-lock.json" }}
+                - paths:
+                    - "~/project/node_modules"
+            - run:
+                name: Build Client Side
+                command: (cd ./client && ../node_modules/webpack/bin/webpack.js --colors)
+            - run:
+                name: Build Server Side
+                command: cp -R ./server/* ./dist
+            - run:
+                name: package.json
+                command: cp ./package*.json ./dist
+            - run:
+                name: Package zip for S3
+                command: (cd ./dist && zip -r /tmp/server.zip ./*)
