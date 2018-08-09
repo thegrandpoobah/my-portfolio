@@ -15,11 +15,6 @@ jobs:
                 key: v1-npm-{{ checksum "package.json" }}
                 paths:
                     - "~/project/node_modules"
-            - persist-to-workspace:
-                root:
-                    - "~/project"
-                paths:
-                    - *
             
     build:
         docker:
@@ -39,16 +34,16 @@ jobs:
                 name: package.json
                 command: cp ./package*.json ./dist
             - persist-to-workspace:
-                root:
-                    - "~/project/dist"
-                paths: *
+                root: "~/project"
+                paths:
+                    - dist
 
     package:
         docker:
             - image: circleci/node:8-browsers
         steps:
             - attach_workspace:
-                at: "~/project/dist"
+                at: "~/project/"
             - run:
                 name: Package zip for S3
                 command: (cd ./dist && zip -r /tmp/server.zip ./*)
