@@ -27,3 +27,31 @@ jobs:
             - run:
                 name: Package zip for S3
                 command: (cd ./dist && zip -r /tmp/server.zip ./*)
+            - persist_to_workspace:
+                root: /tmp
+                paths:
+                    server.zip
+    deploy:
+        docker:
+            - image: circleci/python:2.7-jessie
+        steps:
+            - run:
+                name: Install awscli
+                command: sudo pip install awscli
+            - attach_to_workspace:
+                at: /tmp/workspace
+            - run:
+                name: Deploy to S3
+                command: aws s3 cp --region us-east-1 /tmp/workspace/server.zip s3://my-portfolio-deploy
+
+workflows:
+    version: 2
+    build-deploy:
+        jobs:
+            - build
+            - deploy:
+                requires:
+                    - build
+                # filters:
+                #     branches:
+                #         only: master
