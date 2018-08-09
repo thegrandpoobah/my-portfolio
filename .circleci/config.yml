@@ -1,36 +1,74 @@
 version: 2
 jobs:
-    build:
+    preamble:
         docker:
             - image: circleci/node:8-browsers
         steps:
-            - checkout
+            checkout
             - restore_cache:
                 keys:
-                    - npm-{{ checksum "package-lock.json" }}
+                    - v1-npm-{{ checksum "package.json" }}
             - run:
                 name: Pull Dependencies
                 command: npm install
             - save_cache:
-                key: npm-{{ checksum "package-lock.json" }}
+                key: v1-npm-{{ checksum "package.json" }}
                 paths:
                     - "~/project/node_modules"
+            - persist-to-workspace:
+                root:
+                    - "~/project"
+                paths:
+                    - *
+            
+    build-client:
+        docker:
+            - image: circleci/node:8-browsers
+        steps:
+            checkout
+            - restore_cache:
+                keys:
+                    - v1-npm-{{ checksum "package.json" }}
             - run:
                 name: Build Client Side
                 command: (cd ./client && ../node_modules/webpack/bin/webpack.js --colors)
+            - persist-to-workspace:
+                root:
+                    - "~/project/dist"
+                paths: *
+    
+    build-server:
+        docker:
+            - image: circleci/node:8-browsers
+        steps:
+            checkout
+            - restore_cache:
+                keys:
+                    - v1-npm-{{ checksum "package.json" }}
             - run:
                 name: Build Server Side
                 command: cp -R ./server/* ./dist
             - run:
                 name: package.json
                 command: cp ./package*.json ./dist
+            - persist-to-workspace:
+                root:
+                    - "~/project/dist"
+                paths: *
+
+    package:
+        docker:
+            - image: circleci/node:8-browsers
+        steps:
+            - attach_workspace:
+                at: "~/project/dist"
             - run:
                 name: Package zip for S3
                 command: (cd ./dist && zip -r /tmp/server.zip ./*)
             - persist_to_workspace:
                 root: /tmp
                 paths:
-                    server.zip
+                    - server.zip
     deploy:
         docker:
             - image: circleci/python:2.7-jessie
@@ -41,17 +79,30 @@ jobs:
             - attach_workspace:
                 at: /tmp/workspace
             - run:
-                name: Deploy to S3
+                name: Upload to S3
                 command: aws s3 cp --region us-east-1 /tmp/workspace/server.zip s3://my-portfolio-deploy
+            - run:
+                name: Deploy to OpsWorks
+                command: aws opsworks --region us-east-1 create-deployment --stack-id 2c3577aa-a9de-4f45-9b15-9f563fa44410 --app-id f3b968ea-8510-4694-9034-058dd717b627 --command "{\"Name\":\"deploy\"}"
 
 workflows:
     version: 2
     build-deploy:
         jobs:
-            - build
+            - preamble
+            - build-client
+                requires:
+                    - build
+            - build-server
+                requires:
+                    - build
+            - package
+                requires:
+                    - build-client
+                    - build-server
             - deploy:
                 requires:
                     - build
-                # filters:
-                #     branches:
-                #         only: master
+                filters:
+                    branches:
+                        only: master
