@@ -1,6 +1,6 @@
 version: 2
 jobs:
-  retrieve:
+  build:
     docker:
       - image: circleci/node:8-browsers
     steps:
