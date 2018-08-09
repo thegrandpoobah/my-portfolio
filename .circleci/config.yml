@@ -1,0 +1,10 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/node:8-browsers
+    steps:
+      - checkout
+      - run:
+          name: Build Client Side
+          command: (cd ./client && ../node_modules/webpack/bin/webpack.js --progress --colors)
