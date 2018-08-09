@@ -72,10 +72,10 @@ workflows:
     build-deploy:
         jobs:
             - preamble
-            - build
+            - build:
                 requires:
                     - preamble
-            - package
+            - package:
                 requires:
                     - build
             - deploy:
