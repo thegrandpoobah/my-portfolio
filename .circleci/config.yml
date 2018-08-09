@@ -6,5 +6,8 @@ jobs:
     steps:
       - checkout
       - run:
+          name: Pull Dependencies
+          command: npm install
+      - run:
           name: Build Client Side
           command: (cd ./client && ../node_modules/webpack/bin/webpack.js --progress --colors)
