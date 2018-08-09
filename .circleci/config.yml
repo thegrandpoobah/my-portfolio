@@ -21,7 +21,7 @@ jobs:
                 paths:
                     - *
             
-    build-client:
+    build:
         docker:
             - image: circleci/node:8-browsers
         steps:
@@ -32,19 +32,6 @@ jobs:
             - run:
                 name: Build Client Side
                 command: (cd ./client && ../node_modules/webpack/bin/webpack.js --colors)
-            - persist-to-workspace:
-                root:
-                    - "~/project/dist"
-                paths: *
-    
-    build-server:
-        docker:
-            - image: circleci/node:8-browsers
-        steps:
-            checkout
-            - restore_cache:
-                keys:
-                    - v1-npm-{{ checksum "package.json" }}
             - run:
                 name: Build Server Side
                 command: cp -R ./server/* ./dist
@@ -90,19 +77,16 @@ workflows:
     build-deploy:
         jobs:
             - preamble
-            - build-client
-                requires:
-                    - preamble
-            - build-server
+            - build
                 requires:
                     - preamble
             - package
                 requires:
-                    - build-client
-                    - build-server
+                    - build
             - deploy:
                 requires:
                     - build
-                filters:
-                    branches:
-                        only: master
+                # filters:
+                #     branches:
+                #         only: master
+                
