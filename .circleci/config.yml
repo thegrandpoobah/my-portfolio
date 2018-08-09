@@ -80,7 +80,7 @@ workflows:
                     - build
             - deploy:
                 requires:
-                    - build
+                    - package
                 # filters:
                 #     branches:
                 #         only: master
