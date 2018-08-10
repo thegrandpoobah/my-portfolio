@@ -1,3 +1,5 @@
+[![CircleCI](https://circleci.com/gh/thegrandpoobah/my-portfolio.svg?style=svg)](https://circleci.com/gh/thegrandpoobah/my-portfolio)
+
 # Prerequisites
 
 You must be running VirtualBox, Vagrant, ChefDK, and a couple plug-ins for this project:
