@@ -5,17 +5,11 @@ var config = require('config')
 var DatabaseFile = config.get('database_uri')
 
 function connect () {
-  var exists = fs.existsSync(DatabaseFile)
-  var db = new sqlite3.Database(DatabaseFile)
-
-  if (!exists) {
-    db.serialize(function () {
-      db.run('CREATE TABLE mv (number INTEGER, date INTEGER, currency TEXT, cash TEXT, marketValue TEXT, cost TEXT)')
-      db.run('CREATE INDEX mv_fast ON mv (number, date)')
-    })
+  if (!fs.existsSync(DatabaseFile)) {
+    throw new Error(`Database file ${DatabaseFile} does not exist. Please run migrate.js to create`)
   }
 
-  return db
+  return new sqlite3.Database(DatabaseFile)
 }
 
 module.exports = {
