@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "cd client && ../node_modules/webpack/bin/webpack.js --progress --color --watch",
-    "serve": "cd server && ../node_modules/nodemon/bin/nodemon.js server.js"
+    "serve": "cd server && ../node_modules/babel-watch/babel-watch.js server.js"
   },
   "repository": {
     "type": "git",
@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/thegrandpoobah/my-portfolio#readme",
   "dependencies": {
+    "babel-polyfill": "^6.26.0",
     "bluebird": "^3.5.1",
     "bootstrap": "^3.3.7",
     "bootstrap-sass": "^3.3.7",
@@ -40,6 +41,9 @@
     "sqlite3": "^4.0.2"
   },
   "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
+    "babel-watch": "^2.0.7",
     "bootstrap-loader": "^2.2.0",
     "css-loader": "^0.24.0",
     "eslint": "^4.19.1",
@@ -56,7 +60,6 @@
     "imports-loader": "^0.6.5",
     "modernizr-loader": "0.0.5",
     "node-sass": "^3.8.0",
-    "nodemon": "^1.18.3",
     "resolve-url-loader": "^1.6.0",
     "sass-loader": "^4.0.0",
     "script-loader": "^0.7.2",
