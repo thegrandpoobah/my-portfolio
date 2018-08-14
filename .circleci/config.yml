@@ -29,7 +29,7 @@ jobs:
                 command: (cd ./client && ../node_modules/webpack/bin/webpack.js --colors)
             - run:
                 name: Build Server Side
-                command: cp -R ./server/* ./dist
+                command: ./node_modules/.bin/babel server --out-dir ./dist
             - run:
                 name: package.json
                 command: cp ./package*.json ./dist

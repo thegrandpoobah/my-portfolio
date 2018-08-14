@@ -1,3 +1,5 @@
+import 'babel-polyfill'
+
 var express = require('express')
 var compression = require('compression')
 var moment = require('moment-timezone')
@@ -239,22 +241,23 @@ app.get('/api/accounts/:id/candles', function (req, res) {
   })
 })
 
-app.get('/api/accounts', function (req, res) {
-  questrade.request('v1' + req.originalUrl.substr(4))
-    .then(function (resp) {
-      resp.accounts.push({
-        type: 'Cryptocurrency',
-        number: 'cryptocurrency',
-        status: 'Active',
-        isPrimary: true,
-        isBilling: true,
-        clientAccountType: 'Individual'
-      })
+app.get('/api/accounts', async (req, res) => {
+  try {
+    const resp = await questrade.request('v1' + req.originalUrl.substr(4))
 
-      res.status(200).json(resp)
-    }, function (err) {
-      res.status(err.statusCode).json({ code: err.code, message: err.message })
+    resp.accounts.push({
+      type: 'Cryptocurrency',
+      number: 'cryptocurrency',
+      status: 'Active',
+      isPrimary: true,
+      isBilling: true,
+      clientAccountType: 'Individual'
     })
+
+    res.status(200).json(resp)
+  } catch (err) {
+    res.status(err.statusCode).json({ code: err.code, message: err.message })
+  }
 })
 
 app.get('/api/*', function (req, res) {
