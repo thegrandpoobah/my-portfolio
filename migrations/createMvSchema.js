@@ -2,8 +2,6 @@ const _ = require('lodash')
 const log = require('npmlog')
 
 module.exports = function (db, resolve, reject) {
-  log.info('migrations', 'Executing migration createMvSchema')
-
   db.get('SELECT name FROM sqlite_master WHERE type=\'table\' AND name=\'mv\'', (err, row) => {
     if (err) {
       reject(err)
