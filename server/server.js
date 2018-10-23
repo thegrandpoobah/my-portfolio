@@ -270,6 +270,12 @@ app.get('/api/*', function (req, res) {
 })
 app.use(express.static(config.get('static_assets')))
 
+// we need to constantly refresh the questrade api token in case
+// we haven't accessed the site in a couple days or something
+setInterval(function () {
+  questrade.request('v1/accounts')
+}, moment.duration(1, 'hour').asMilliseconds())
+
 app.set('etag', false)
 
 var options = {
