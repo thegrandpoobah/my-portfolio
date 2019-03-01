@@ -22,7 +22,7 @@
     "babel-polyfill": "^6.26.0",
     "bluebird": "^3.5.1",
     "bootstrap": "^3.4.0",
-    "bootstrap-sass": "^3.3.7",
+    "bootstrap-sass": "^3.4.1",
     "bootstrap-switch": "^3.3.2",
     "compression": "^1.7.3",
     "config": "^1.30.0",
