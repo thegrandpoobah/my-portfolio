@@ -22,6 +22,13 @@ You must be running VirtualBox, Vagrant, ChefDK, and a couple plug-ins for this 
 4. `vagrant up`
 5. `vagrant ssh`
 
+# Database Setup
+
+To initialize a blank database, you need to run the migrations via the `db.js` command:
+
+1. `node db.js init`
+2. `node db.js migrate`
+
 # Encrypted Data Bag Setup
 
 This repository contains encrypted data that requires a specific private

@@ -1,8 +1,7 @@
 node_modules
 dist
 .tmp
-authorization*.json
-*.db
+data/*
 *.zip
 *.tar.gz
 aws secret.txt
@@ -10,8 +9,6 @@ server/config/development.json
 server/config/production.json
 encrypted_data_bag_secret
 .vagrant
-data/localhost.crt
-data/localhost.key
 chef/Berksfile.lock
 chef/nodes/dev.json
 chef/ubuntu-xenial-16.04-cloudimg-console.log
